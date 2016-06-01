@@ -12,6 +12,8 @@ GAME PLAN:
         - Fuel = His Quotes
         - Victory will be him in the White House
         - Defeat will be him watching someone in the White House
+        - Game map: Trump's face is in bottom-left corner with text bubble on top, superimposed on American flag, wall is being built on the right side of the screen.
+        - Measure distance using number of tiles printed
   
 MAINLOOP: input > transitions  > state > graphics
 
