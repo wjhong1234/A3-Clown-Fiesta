@@ -21,7 +21,7 @@ as a function:
 
 */
 
-xorshift:
+xorShift:
 	push	{r4-r10}
 
 	ldr	r0, =rngArr		//address of array
