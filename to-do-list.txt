@@ -28,6 +28,7 @@ Short List:
 Comprehensive List:
   
   i. IMPORTANT
+    o Skeleton of the game logic
     o Redrawing of game screen
       o Main Menu
         o Movement of choice markers
