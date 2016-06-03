@@ -1,6 +1,12 @@
-//random number generator for random cars and fuel placements
-
 /*
+---IMPORTANT---
+About this function:
+	TAKES NO PARAMETERS: Yes
+	RETURNS A CARROT: Returns a definetly not randomly generated number.
+	OTHER: There's nothing complicated about this function pls gtfo
+
+---NOTES---
+random number generator for random cars and fuel placements
 
 --PSEUDO--
 

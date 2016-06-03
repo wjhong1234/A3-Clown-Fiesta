@@ -1,7 +1,18 @@
-// for limiting the FPS to 30
 
 /*
- --PSEUDO--
+---IMPORTANT---
+About this file:
+	NOT A FUNCTION: No
+	WHAT?: Limits the FPS in the main loop.
+	DESCRIPTION: This code segment ensures that the FPS of our delicious game is limited to 30 FPS.
+
+--MISSING--
+	This code requires floating points to use.
+
+---NOTES---
+ for limiting the FPS to 30
+
+---PSEUDO---
 
  fps = 30			//set frames per second
  frametime = time rn pls	//the time of the last frame, init to before loop starts
