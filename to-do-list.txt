@@ -30,8 +30,8 @@ Comprehensive List:
   i. IMPORTANT
     o Skeleton of the game logic
     o Redrawing of game screen
-      o Main Menu
-        o Movement of choice markers
+      / Main Menu
+        / Movement of choice markers
       o Game
         o Pop-up prompt
     o Motion of objects
@@ -39,10 +39,10 @@ Comprehensive List:
       o Figure out how to make items ("fuel", "car") look as if going down
   
   ii. Input
-    / Main menu
-      / Up
-      / Down
-      / A (Select the item)
+    x Main menu
+      x Up
+      x Down
+      x A (Select the item)
     o Game
       o Left
       o Right
