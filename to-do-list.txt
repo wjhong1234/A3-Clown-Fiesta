@@ -30,8 +30,8 @@ Comprehensive List:
   i. IMPORTANT
     o Skeleton of the game logic
     o Redrawing of game screen
-      / Main Menu
-        / Movement of choice markers
+      x Main Menu
+        x Movement of choice markers
       o Game
         o Pop-up prompt
     o Motion of objects
@@ -65,9 +65,9 @@ Comprehensive List:
       o Side tile
       o Redraw at center
     o Item update
-      w Randomly place items
-        w Fuel
-        w Cars
+      / Randomly place items
+        / Fuel
+        / Cars
   
   iv. Game State
     o Initialize state
@@ -81,9 +81,9 @@ Comprehensive List:
     o Track lose condition
 
   v. Game Map
-    w Form array map
+    / Form array map
       x Decide size of side and road
-      w Initialize array
+      / Initialize array
         COMMENT: still working on this
       o Flag side tiles
       o Flag road tiles
