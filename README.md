@@ -14,9 +14,70 @@ GAME PLAN:
         - Defeat will be him watching someone in the White House
         - Game map: Trump's face is in bottom-left corner with text bubble on top, superimposed on American flag, wall is being built on the right side of the screen.
         - Measure distance using number of tiles printed
-  
-MAINLOOP: input > transitions  > state > graphics
+    
+================================================================================
+-main
+  -menu
+  -tick
+    -input
+    -player
+    -item
+    -map
+  -render
 
+tick.s
+  - GAME STATE & UPDATES
+  - Determines victory conditions
+  - IMPORTANT: updates everything in the game, from player to map to spawn.
+  
+  TICK updates every part of the game, and keeps track of the game state. The GAMELOOP is contained in here.
+
+player.s
+  - PLAYER
+  - Movement & location for player, tracks fuel & lives.
+
+  PLAYER is literally the person playing the game. Has functions for movement and contains all information about the bitch.
+
+input.s
+  - INPUTS
+  - Buttons and whatnot
+
+  INPUT is just for buttons input. Sends all that shit to player.s and lets that deal with it.
+
+item.s
+  - ALL SPAWNS (FUEL & OBSTACLES)
+  - Creates, moves, deletes, and keeps track of all spawned items (including type [fuel/ obstacle]).
+
+  ITEM spawns everything, keeps track of those spawned items, and does movement/deletion for those items.
+
+menu.s
+  - MAIN MENU
+  - Start Game & Quit Game
+  
+  If you don't know what MENU is fuck you.
+
+main.s
+  - MAIN GAME LOOP (ENTIRE PROGRAM)
+  - Contains FPS control code.
+
+  MAIN contains the program loop, and the FPS code to limit our game to around 30 FPS. Loop will be tick>render.
+
+render.s
+  - DRAWS EVERYTHING
+  - Wipes game assets (except the clean map) after every loop iteration.
+
+  RENDER does all of the drawing. It should contain the map and have a function "wipe" that clears everything after each loop.
+
+map.s
+  - MAP STUFF
+  - Moves the road
+  - Tile count should be here so the other parts of our program can function.
+  - POTENTIALLY contains Donald Trump reaction code.
+
+  MAP contains everything on the map that moves and isn't the player or a spawned item. Also does tile counting.
+  
+Disclaimer: We are NOT Donald Trump supporters :33 
+===================================OLD===================================
 map.s
   - MAP OF THE GAME (LIKE THE ENVIRONMENT AND STUFF)
   
@@ -49,36 +110,3 @@ menu.s
   
 graphics.s
   - DRAWS everything. like bruh, EVERYTHING
-  
-Disclaimer: We are NOT Donald Trump supporters :33 
-------------------------BEFORE STUFF------------------------------
-STARTING NOTES:
-  - not set in stone cause i have no clue what's going on rn
-  - if it happens the points he has are the files we need to create then fuck meh
-
-Note: all capitalized things are either variables or functions probably iunno
-
-player.s
-  - will INITIALIZE the player and keep track of player HEALTH, FUEL, LIVES, and POSITION.
-  - also DRAWS player on the map, probably also the player stats on screen
-
-map.s
-  - INITIALIZE the map
-  - UPDATES the map
-  - like draws the environment stuff
-  
-strangers.s
-  - INITIALIZES and DRAWS the random stranger cars.
-  - keeps track of random cars POSITION
-
-fuel.s
-  - can probably be merged with another file
-  - randomly generates POSITION of fuel.
-
-game.s / main.s
-  - INITIALIZES the game and stuff.
-  - include controller here too
-  - all the game logic here pls keep it clean children
-  
-menu.s
-  - INITIALIZES the dirty main menu
