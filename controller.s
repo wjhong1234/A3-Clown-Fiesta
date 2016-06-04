@@ -26,6 +26,7 @@ pressLoop:
 //	moveq	SAVED_BUTTONS, r5	// if not, preserves unpressed state
 	beq	pressLoop		// it also keeps looping
 
+	lsr	r5, #5			// shift the unneeded four bits out (13-16)
 	mov	r0, r5			// returns buttons pressed to main
 	pop	{r4-r10, lr}
 	bx 	lr
@@ -199,29 +200,16 @@ pulseLoop:
 	pop	{r4-r10, lr}
 	bx	lr
 
-returnButton:
-	COUNTER .req r6
-	CLONE .req r5
-
-	push	{r4-r10, lr}
-	mov	BUTTONS, r0
-	mov	COUNTER, #0		// counter to read the 12 buttons
-	lsr	BUTTONS, #5		// shift the unneeded four bits out (13-16)
-	
-	ror	CLONE, BUTTONS, #12	// copy the buttons with the relevant bits moved to the right side of the register
-
-read:
-	add	COUNTER, #1
-	lsls	CLONE, #1
-	bcs	read
-
-	cmp	COUNTER, #13
-	moveq	r0, #0
-	movlt	r0, COUNTER
-end:
-	pop	{r4-r10, lr}
+.globl checkButton
+/*
+Checks if button is being pressed
+r0 - buttons pressed
+r1 - button wanted
+*/
+checkButton:
+	orr	r2, r0, r1	// let's test this
+	cmp	r1, r2		// check to see if it matches the desired button
+	moveq	r0, #1		// if it matches, return true
+	movne	r0, #0		// if not, return false
 	bx	lr
-
-	.unreq	COUNTER
-	.unreq	BUTTONS
 

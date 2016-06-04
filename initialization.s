@@ -7,7 +7,7 @@
 	.equ	CLOCK, 11
 
 initi:
-	
+	push	{r4-r10, lr}
 	bl	InitFrameBuffer
 	
 	// INITIALIZE THE SNES
@@ -24,4 +24,5 @@ initi:
 	mov	r1, #1		// which utilizes an output function
 	bl	Init_GPIO
 
+	pop	{r4-r10, lr}
 	bx	lr
