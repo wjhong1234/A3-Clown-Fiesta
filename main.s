@@ -5,25 +5,24 @@ _start:
     b       main
     
 .section .text
+	.equ	START, #0
+	.equ	QUIT, #1
+	
+	INPUT .req r4
 
 main:
     	mov	sp, #0x8000	// Initializing the stack pointer
 	bl	EnableJTAG
 
-	bl	initi
+	bl	initi		// Initialize everything
 
 mainmenu:
-	bl	menu
-	mov	r4, r0
-	cmp	r4, #1
-
-	mov	r0, #0		// initial x
-	mov	r1, #0		// initial y
-	ldr	r2, =1023	// final x
-	ldr	r3, =767	// final y
-	ldr	r4, =lose_pic
-	bleq	CreateImage
-	blne	clearScreen
+	bl	menu		// First bring up the menu
+	mov	INPUT, r0	  
+	cmp	INPUT, #QUIT	// if input is "loss" (or quit)
+	bleq	drawLose	// the draw the losing screen
+	blne	clearScreen	// otherwise, clear screen
+	//blne	game
     
 haltLoop$:
-	b		haltLoop$
+	b	haltLoop$

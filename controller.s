@@ -1,6 +1,7 @@
 .section .text
 .globl getInput
 .globl Init_GPIO
+
 	.equ	BASE_ADRS, 0x3f200000
 	.equ	LATCH, 9
 	.equ	DATA, 10
