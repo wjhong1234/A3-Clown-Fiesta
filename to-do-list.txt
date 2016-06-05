@@ -9,7 +9,7 @@ Short List:
   
   i.    IMPORTANT
     :: What we need to figure out ASAP
-  ii.   Input
+  ii.   Input   !!!!!  [COMPLETE]
     :: Taking the input from the player and causing things to happen
   iii.  Game Update
     :: Keeping track of changes in state
@@ -29,7 +29,7 @@ Comprehensive List:
   
   i. IMPORTANT
     o Skeleton of the game logic
-    o Redrawing of game screen
+    / Redrawing of game screen
       x Main Menu
         x Movement of choice markers
       o Game
@@ -43,28 +43,29 @@ Comprehensive List:
       x Up
       x Down
       x A (Select the item)
-    o Game
-      o Left
-      o Right
-      o A (Movement)
-      o Select (Restart game)
-      o Start (Exit game)
+    x Game
+      x Left
+      x Right
+      x A (Movement)
+      x Select (Restart game)
+      x Start (Exit game)
   
   iii. Game Update
-    o Track loss
-      o Contact
-      o No more fuel
-    o Track win
-      o Reach end
+    / Track loss
+      / Contact
+      x No more fuel
+    / Track win
+      / Reach end
+      COMMENT: FIGURE OUT WHERE MAP ENDS?
     o Track amount traveled (?)
-    o Fuel effect
-      o Increase: Fuel item
+    / Fuel effect
+      / Increase: Fuel item
       o Decrease: Time/Pressing A
-    o Contact effect (lose 10 fuel, one life)
+    / Contact effect (lose 10 fuel, one life)
       o Car
-      o Side tile
+      / Side tile
       o Redraw at center
-    o Item update
+    / Item update
       / Randomly place items
         / Fuel
         / Cars
@@ -77,16 +78,16 @@ Comprehensive List:
     o Track player's status
       o Lives
       o Fuel units
-    o Track win condition
-    o Track lose condition
+    x Track win condition
+    x Track lose condition
 
   v. Game Map
     / Form array map
       x Decide size of side and road
       / Initialize array
-        COMMENT: still working on this
-      o Flag side tiles
-      o Flag road tiles
+        COMMENT: MUST FIX THIS
+      X Flag side tiles
+      X Flag road tiles
       o Flag if occupied with "fuel" or "car"
     o Iffy
       COMMENT: Will mentioned that it was weird to have it here. idk.
@@ -105,24 +106,24 @@ Comprehensive List:
       x Start (text)
       x Choice marker
       x Creator names (text)
-    o Game
-      o Background
-        o Road
-          o Decide what road should be
-        o Left Side 
-          o Donald Trump
-            o Three faces
-          o Quotes (?)
-          o American eagle
-        o Right Side
-          o Statue of Liberty
+    / Game
+      x Background
+        x Road
+          x Decide what road should be
+        x Left Side 
+          x Donald Trump
+            x Three faces
+          REMOVED: o Quotes (?)
+          x American eagle
+        REMOVED: o Right Side
+          REMOVED: o Statue of Liberty
       o Items on Road
         o Player
         o "Fuel" (toupe)
         o "Cars" (still unsure)
           o decide what antagonist should be
-    o Condition Screens
-      o Lose screen
+    / Condition Screens
+      x Lose screen
       o Win screen
     o Prompt Pop-up (pausing the game)
       o Resume (text)
