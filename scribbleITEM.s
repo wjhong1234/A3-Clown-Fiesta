@@ -1,7 +1,7 @@
 /*
 ---IMPORTANT---
 About function "spawn":
-	ONE PARAMETER: A flag to determine whether the spawned item is an obstacle or fuel item.
+	NO PARAMETER: A flag to determine whether the spawned item is an obstacle or fuel item.
 	VOID: This function determines where the items spawn.
 	OTHER: This file keeps track of each item in an array [NUMBER] + [XPos/YPos/Flag]*.
 
@@ -46,26 +46,54 @@ delete an item:
 .equ	SPEED, 3			//DEFAULT SPEED 
 
 spawn:
+
+	PASTILE		.req	r1
+	CURRENTILE	.req	r0
+	DIFFERENCE	.req	r2
+	REQTILE		.req	r3
+
 	push	{r4-r10}
 
 	//***the following segment decides how many tiles in the obstacle will spawn.
-	//***if we do this once every second, then the maximum amount of objects ever will be 7
+	ldr	r0, =pasT		//load past tile counter
+	ldr	PASTILE, [r0]		//load actual past tile number
+
+	bl	countTiles		//currenTILE - pasTILE into DIFFERENCE
+
+	sub	DIFFERENCE, CURRENTILE, PASTILE
+
+	ldr	r0, =tiles		//load address of tile count
+	ldr	REQTILE, [r0]		//load required tiles count
+
+	cmp	REQTILE, #0		//compare tile count to zero
+	bgt	cSpn			//generate new number if zero
 
 	bl	xorShift		//generate a random number
-	and	r0, #7			//and with 7 to get number within 7
+	and	r1, r0, #7		//and with 7 to get number within 7
+	cmp	r1, #0
+	addeq	r1, #1			//if the generated number is zero, add one
+	str	r1, =tiles
+	b	spnEnd			//end function
 	
-	//COUNT tiles to generated number in order to spawn obstacle
+	//only spawn new item if tilereq is met
+cSpn:	cmp	REQTILE, DIFFERENCE	//compare tile difference to tile spawn number
+	blt	spnEnd			//end function
 
+	.unreq	PASTILE
+	.unreq	CURRENTILE
+	.unreq	DIFFERENCE
+	.unreq	REQTILE
+
+	//*** this is to generate a position to spawn in
 	bl	xorShift		//generate another random number
 	and	r0, #0b111111111	//and this to make it smaller
 
 	//***crop guarantees that r0 will be a number within the size of the road.
-
 crop:	cmp	r0, *ROADMAX		//compare randomly generated number to usable road size
 	bgt	smalls
 	cmp	r0, *ROADMIN		//compare randomly generated number to usable road rize
 	blt	bigs
-	b	next			//keep checking until number is within road
+	b	itFits			//keep checking until number is within road
 
 smalls:	sub	r0, *ROADMAX		//if it's bigger subtract the max from the number
 	b	crop
@@ -73,11 +101,44 @@ smalls:	sub	r0, *ROADMAX		//if it's bigger subtract the max from the number
 bigs:	add	r0, *ROADMIN		//if it's smaller add the min to the number
 	b	crop
 	
-	//create item in the generated number once the required number of tiles is counted
-	//add item to spawn array
-	//increment number of items (first four bits in spawn array).
+	NEWADDRESS	.req	r2
+	BASEADDRESS	.req	r2
+	OFFSET		.req	r1	
+	COUNTER		.req	r1
+	ITEMTYPE	.req	r0
+	XPOS		.req	r0
 
-	pop	{r4-r10}
+itFits:	ldr	BASEADDRESS, =spnArr	//load address
+	ldr	COUNTER, [BASEADDRESS]	//load counter
+
+	add	COUNTER, #1		//increment counter
+	str	COUNTER, [BASEADDRESS]
+
+	lsl	COUNTER, #2		//multiply counter by 4
+	add	NEWADDRESS, OFFSET	//address for xpos of new item (offset)
+	str	XPOS, [NEWADDRESS], #4	//store xpos of new item into memory
+
+	str	#0, [NEWADDRESS], #4	//store zero into ypos
+	
+	bl	xorShift		//generate new random number
+	and	r0, #1			//make it either zero or one
+	str	ITEMTYPE, [r2]		//store random item type into memory for item
+
+	ldr	r0, =tiles		//load tile address
+	str	#0, [r0]		//store zero into tilereq
+
+	ldr	r1, =pasT		//load last time spawn was made
+	bl	countTiles		//current tile
+	str	r0, [r1]		//load current tile count into last spawn
+
+	NEWADDRESS	.unreq
+	BASEADDRESS	.unreq
+	OFFSET		.unreq
+	COUNTER		.unreq
+	ITEMTYPE	.unreq
+	XPOS		.unreq
+
+spnEnd:	pop	{r4-r10}
 
 spawnMove:
 	push	{r4-r10}
@@ -149,3 +210,7 @@ bye:	pop	{r4-r10}
 .section .data
 spnArr:	.skip	(7 * 3 * 4) + 4		//Allocate memory for 7 items and the item counter
 	.end
+
+pasT:	.int	0			//tile since last loop
+
+tiles:	.int 	0			//tiles to count

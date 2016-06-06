@@ -20,7 +20,7 @@ moveMap:
 	
 	
 	pop	{r4-r10}
-	bx	lr
+
 
 countTiles:
 	push	{r4-r10}
@@ -28,4 +28,3 @@ countTiles:
 	
 
 	pop	{r4-r10}
-	bx	lr
