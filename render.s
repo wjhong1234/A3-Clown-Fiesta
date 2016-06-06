@@ -84,9 +84,68 @@ DrawPixel:
 	parts of the game.
 */
 
+/*
+render
+
+This draws everything based on the game's state
+*/
+render:
+	push	{r4}
+	pop		{r4}
+	bx		lr
+
+
+
+
+
+.globl	drawFace
+/*
+drawFace
+Draws faces of DT.
+r0 - state of Donald Trump
+0 - normal, 1 - collision, 2 - fuel
+*/
+drawFace:
+	push	{r4, lr}	
+	
+	subs	r0, #1		// check the status of face
+	ldreq	r4, =face_c	// collision (1) - 1 = zero flag (eq)
+	ldrne	r4, =face_f	// fuel (2) - 1 = positive flag (ne)
+	ldrmi	r4, =face_n	// normal (0) - 1 = negative flag (mi)
+	
+	mov	r0, #47		// initial x
+	ldr	r1, =568	// initial y
+	ldr	r2, =167	// final x
+	ldr	r3, =755	// final y
+	bl	CreateImage
+	
+	pop	{r4, lr}
+	bx	lr
+
+
+.globl	drawTiles
+/*
+drawTile
+Draws specific tiles (32 x 32)
+
+r0 - tile address
+r1 - x coordinate
+r2 - y coordinate
+*/
+drawTile:
+	push	{r4, lr}
+	mov	r4, r0		// move address (r0) to arg 4
+	mov	r0, r1		// move	x coordinate (r1) to arg 0
+	mov	r1, r2		// move y coordinate (r2) to arg 1
+	add	r2, r0, #32	// x + 32 = x final
+	add	r3, r1, #32	// y + 32 = y final
+	bl	CreateImage
+
+	pop	{r4, lr}
+	bx	lr
+
 
 .globl	drawFlags
-
 	.equ	START, #1
 drawFlags:
 	push	{r4, lr}
@@ -110,6 +169,7 @@ drawFlags:
 
 	pop	{r4, lr}
 	bx	lr
+	
 
 .globl drawLose
 	

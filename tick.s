@@ -22,8 +22,8 @@
 	.equ	MOVE_RIGHT, 3
 
 	// The outer edges of the map
-	.equ	LEFT, 300	// numbers are tentative
-	.equ	RIGHT, 400
+	.equ	LEFT, 352
+	.equ	RIGHT, 864
 
 
 .globl	gameStart
