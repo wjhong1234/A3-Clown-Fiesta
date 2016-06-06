@@ -1,10 +1,5 @@
 .section .text
 .globl	CreateImage
-	// the offsets for the image structure
-	.equ	x_start, 4		// the offset to retrieve initial x
-	.equ	x_final, 8		// the offset to retrieve final x
-	.equ	y_start, 12		// the offset to retrieve initial y
-	.equ	y_final, 16		// the offset to retrieve final y
 
 /* Create Image
  * provided the size of the image and the
@@ -95,6 +90,25 @@ render:
 	bx		lr
 
 
+
+// work in progress
+.globl	drawRoad
+	.equ	RIGHT, 864	// rightmost edge of the road
+	.equ	LEFT, 352	// leftmost edge of the road
+	.equ	CENTRE, 512	// center of road
+				
+				
+	.equ	SPACE, 6	// the space between the white road marks
+drawRoad:
+	push	{r4-r10, lr}
+	
+	ldr	r5, =CENTRE	
+	sub	r0, r5, #16	// center - 16 = leftmost edge of road mark
+	mov	r1, #4444
+	add	r2, r5, #16	// center + 16 = rightmost edge of road mark
+	add	r3, r1, #32	// the bottom-most edge of the tile
+	pop	{r4-r10, lr}
+	bx	lr
 
 
 
