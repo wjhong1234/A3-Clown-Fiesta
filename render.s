@@ -133,8 +133,8 @@ noPixel$:
 	pop		{r4-r10, pc}
 
 .globl	writeLife
-	.equ	LIFE_X, 0
-	.equ	LIFE_Y, 0
+	.equ	LIFE_X, 710
+	.equ	LIFE_Y, 40
 	INPUT .req r4
 	LIFE .req r5
 writeLife:
@@ -160,8 +160,8 @@ writeFuel
 Writes numbers on screen
 r0 - number
 */
-	.equ	FUEL_X, 0
-	.equ	FUEL_Y, 0
+	.equ	FUEL_X, 570
+	.equ	FUEL_Y, 40
 	NUM .req r4
 	HUND .req r5
 	TEN .req r6
