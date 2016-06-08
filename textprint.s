@@ -57,7 +57,7 @@ pressAPrint:
 	ldr	r0, =pressA
 	mov	r1, #16
 	ldr	r2, =540
-	ldr	r3, =500
+	ldr	r3, =384
 	ldr	r4, =0xFFFF
 	bl	printText
 
