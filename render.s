@@ -311,7 +311,7 @@ drawTile:
 .globl	drawFlags
 	.equ	START, 1
 drawFlags:
-	push	{r4, lr}
+	push	{r4-r10, lr}
 	
 	cmp	r0, #START	
 	
@@ -331,7 +331,7 @@ drawFlags:
 	mov	r4, r5
 	bl	CreateImage
 
-	pop	{r4, lr}
+	pop	{r4-r10, lr}
 	bx	lr
 
 .globl drawLose
