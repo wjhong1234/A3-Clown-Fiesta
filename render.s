@@ -263,8 +263,6 @@ drawRoad:
 	pop	{r4-r10, lr}
 	bx	lr
 
-
-
 .globl	drawFace
 /*
 drawFace
@@ -289,7 +287,6 @@ drawFace:
 	pop	{r4, lr}
 	bx	lr
 
-
 .globl	drawTiles
 /*
 drawTile
@@ -311,9 +308,8 @@ drawTile:
 	pop	{r4, lr}
 	bx	lr
 
-
 .globl	drawFlags
-	.equ	START, #1
+	.equ	START, 1
 drawFlags:
 	push	{r4, lr}
 	
@@ -336,7 +332,6 @@ drawFlags:
 
 	pop	{r4, lr}
 	bx	lr
-	
 
 .globl drawLose
 	
