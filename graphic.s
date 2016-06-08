@@ -230,17 +230,13 @@ noPixel$:
 writeLife:
 	push	{r4-r10, lr}
 
-	mov	ONE, #48	// initialize one's place to decimal number of '0'
-	
-getLife:
-	cmp	INPUT, #1	
-	subge	INPUT, #1		// if the number >= 0, then		
-	addge	LIFE, #1		// add 1 to ones
-	bge	getLife		// keep looping until number < 1
+	mov	INPUT, r0
+	mov	LIFE, #48	// initialize one's place to decimal number of '0'
+	add	LIFE, INPUT
 
 	mov	r0, LIFE
 	ldr	r1, =0xFFFF	// arg 2: colour of string
-	mov	r2, =LIFE_X	// arg 3: x-coord
+	ldr	r2, =LIFE_X	// arg 3: x-coord
 	ldr	r3, =LIFE_Y	// arg 4: y-coord
 	
 	bl	DrawChar	// prints one char
