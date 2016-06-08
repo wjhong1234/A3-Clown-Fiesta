@@ -70,7 +70,7 @@ dsclmPrint:
 	push	{r4-r10, lr}
 
 	ldr	r0, =dsclm
-	mov	r1, #28
+	mov	r1, #40
 	ldr	r2, =10
 	ldr	r3, =750
 	ldr	r4, =0xF9A9
@@ -146,6 +146,6 @@ instr2: .ascii "START: RESTART"	// 14
 .globl pressA
 pressA: .ascii "PRESS A TO START"	// 16
 .globl dsclm
-dsclm: .ascii "We are not Trump supporters."	// 28
+dsclm: .ascii "DISCLAIMER: We are not Trump supporters."	// 40
 .globl prompt
 prompt: .ascii "PRESS ANY BUTTON TO CONTINUE"	// 28
