@@ -4,89 +4,47 @@
 tutorialPrint:
 	push	{r4-r10, lr}
 
-	mov	r4, #5
-	ldr	r5, =fuel
-	ldr	r6, =520
-fuelLoop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
-	ldr	r3, =50
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	fuelLoop
+	ldr	r0, =fuel
+	mov	r1, #5
+	ldr	r2, =520
+	ldr	r3, =40
+	ldr	r4, =0xFFFF
+	bl	printText
 
-	mov	r4, #6
-	ldr	r5, =life
-	ldr	r6, =650
-lifeLoop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
-	ldr	r3, =50
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	lifeLoop
+	ldr	r0, =life
+	mov	r1, #6
+	ldr	r2, =650
+	ldr	r3, =40
+	ldr	r4, =0xFFFF
+	bl	printText
 
-	mov	r4, #29
-	ldr	r5, =tuto1
-	ldr	r6, =475
-tuto1Loop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
+	ldr	r0, =tuto1
+	mov	r1, #29
+	ldr	r2, =475
 	ldr	r3, =0
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	tuto1Loop
+	ldr	r4, =0xFFFF
+	bl	printText
 
-	mov	r4, #29
-	ldr	r5, =tuto2
-	ldr	r6, =475
-tuto2Loop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
+	ldr	r0, =tuto2
+	mov	r1, #29
+	ldr	r2, =475
 	ldr	r3, =15
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	tuto2Loop
+	ldr	r4, =0xFFFF
+	bl	printText
 
-	mov	r4, #17
-	ldr	r5, =instr1
-	ldr	r6, =680
-instr1Loop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
-	ldr	r3, =35
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	instr1Loop
+	ldr	r0, =instr1
+	mov	r1, #17
+	ldr	r2, =0
+	ldr	r3, =0
+	ldr	r4, =0xFFFF
+	bl	printText
 
-	mov	r4, #14
-	ldr	r5, =instr2
-	ldr	r6, =420
-instr2Loop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
-	ldr	r3, =35
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	instr2Loop
+	ldr	r0, =instr2
+	mov	r1, #14
+	ldr	r2, =0
+	ldr	r3, =15
+	ldr	r4, =0xFFFF
+	bl	printText
 
 	pop 	{r4-r10, lr}
 	bx	lr
@@ -96,19 +54,12 @@ instr2Loop:
 pressAPrint:
 	push	{r4-r10, lr}
 
-	mov	r4, #16
-	ldr	r5, =pressA
-	ldr	r6, =540
-pressALoop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xFFFF
-	mov	r2, r6
-	ldr	r3, =384
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	pressALoop
+	ldr	r0, =pressA
+	mov	r1, #16
+	ldr	r2, =540
+	ldr	r3, =500
+	ldr	r4, =0xFFFF
+	bl	printText
 
 	pop 	{r4-r10, lr}
 	bx	lr
@@ -118,19 +69,12 @@ pressALoop:
 dsclmPrint:
 	push	{r4-r10, lr}
 
-	mov	r4, #28
-	ldr	r5, =dsclm
-	ldr	r6, =10
-dsclmLoop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xF9A9
-	mov	r2, r6
+	ldr	r0, =dsclm
+	mov	r1, #28
+	ldr	r2, =10
 	ldr	r3, =750
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	dsclmLoop
+	ldr	r4, =0xF9A9
+	bl	printText
 
 	pop 	{r4-r10, lr}
 	bx	lr
@@ -148,8 +92,6 @@ promptPrint:
 
 	pop 	{r4-r10, lr}
 	bx	lr
-
-
 
 .globl	printText
 /*
