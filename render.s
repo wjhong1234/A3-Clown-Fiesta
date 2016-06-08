@@ -320,14 +320,15 @@ drawFlags:
 	ldr	r2, =367	// final x
 	ldr	r3, =627	// final y
 	ldreq	r4, =leftstart_pic
+	ldreq	r5, =rightstart_pic
 	ldrne	r4, =leftquit_pic
+	ldrne	r5, =rightquit_pic
 	bl	CreateImage
 	ldr	r0, =671	// initial x
 	ldr	r1, =480	// initial y
 	ldr	r2, =711	// final x
 	ldr	r3, =629	// final y
-	ldreq	r4, =rightstart_pic
-	ldrne	r4, =rightquit_pic
+	mov	r4, r5
 	bl	CreateImage
 
 	pop	{r4, lr}
