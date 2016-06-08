@@ -136,23 +136,15 @@ dsclmLoop:
 	bx	lr
 
 .globl promptPrint
-
 promptPrint:
 	push	{r4-r10, lr}
 
-	mov	r4, #28
-	ldr	r5, =prompt
-	ldr	r6, =372
-promptLoop:
-	ldrb	r0, [r5], #1
-	ldr	r1, =0xF9A9
-	mov	r2, r6
+	ldr	r0, =prompt
+	mov	r1, #28
+	ldr	r2, =372
 	ldr	r3, =0
-	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
-	bgt	promptLoop
+	ldr	r4, =0xF9A9
+	bl	printText
 
 	pop 	{r4-r10, lr}
 	bx	lr
@@ -166,22 +158,29 @@ r1 - length
 r2 - x coord
 r3 - y coord
 r4 - color
-
 */
-	COLOR .req r1
-	X_COORD .req r3
+	COLOR .req r8
+	Y_COORD	.req r7
+	X_COORD .req r6
+	LENGTH .req r4
+	ADRS .req r5
 printText:
 	push	{r4-r10, lr}
-	mov	COLOR, r4
+	mov	ADRS, r0
 	mov	X_COORD, r2
-	mov	r4, r1	
+	mov	Y_COORD, r3
+	mov	COLOR, r4
+	mov	LENGTH, r1
 textLoop:
-	ldrb	r0, [r5], #1
-	mov	r2, r6
+	ldrb	r0, [ADRS], #1
+	mov	r1, COLOR
+	mov	r2, X_COORD
+	mov	r3, Y_COORD
 	bl	DrawChar
-	add	r6, #10
-	sub	r4, #1
-	cmp	r4, #0
+	add	X_COORD, #10
+	sub	LENGTH, #1
+	cmp	LENGTH, #0
+	bgt	textLoop
 
 	pop	{r4-r10, lr}
 	bx	lr
