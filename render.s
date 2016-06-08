@@ -392,3 +392,21 @@ image:
 	.int 0	// initial y
 	.int 0	// final y
 
+.globl fuel
+fuel: .ascii "FUEL:"	// 5
+.globl life
+life: .ascii "LIVES:"	// 6
+.globl tuto1
+tuto1: .ascii "GET TRUMP TO THE WHITE HOUSE!"	// 29
+.globl tuto2
+tuto2: .ascii "AVOID BERNIE, COLLECT TOUPEES"	// 29
+.globl instr1
+instr1: .ascii "SELECT: MAIN MENU"	// 17
+.globl instr2
+instr2: .ascii "START: RESTART"	// 14
+.globl pressA
+pressA: .ascii "PRESS A TO START"	// 16
+.globl dsclm
+dsclm: .ascii "We are not Trump supporters."	// 28
+.globl contPrompt
+contPrompt: .ascii "PRESS ANY BUTTON TO CONTINUE"	// 28
