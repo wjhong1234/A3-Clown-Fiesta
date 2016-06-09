@@ -89,9 +89,51 @@ r1 - y coordinate
 getTileCoord:
 	add	r0, #X_OFF
 	add	r1, #X_OFF
-	lsl	r0, #5		// 
-	lsl	r1, #5		// 
+	lsl	r0, #5		// column * 32 
+	lsl	r1, #5		// row * 32
+	bx	lr
 
+
+.globl	getOverlap
+/*
+getOverlap
+Retrieves type of the overlapping item if it exists.
+If it doesn't exist, then it will return a 0.
+
+r0 - None/Fuel/Car (0/1/2)
+*/
+	push	{r4-r10, lr}
+
+	ldr	r1, =player	// retrieve player reference
+	ldr	r0, [r1, #4]	// load column of player
+	mov	r1, #22		// retrieve row of player
+	bl	getTileRef	// retrieve tile reference
+	ldr	r1, [r0, #8]	// load possible item flag
+	mov	r0, r1		// return the item flag
+	
+	pop	{r4-r10, lr}
+	bx	lr
+
+
+.globl	hasCollide
+/*
+hasCollide
+Checks if the player has collided with a wall.
+
+Returns:
+r0 - 0 if false, 1 if true
+*/
+hasCollide:
+	push	{r4-r10, lr}
+	ldr	r1, =player		// retrieve player reference
+	ldr	r0, [r1, #4]		// load column of player
+	mov	r1, #22			// retrieve row of player
+	bl	getTileRef		// retrieve tile reference
+	ldr	r1, [r0]		// load tile type
+	cmp	r1, #0			// check if tile is side
+	moveq	r0, #1			// return true if side
+	movne	r0, #0			// return false if not
+	pop	{r4-r10, lr}
 	bx	lr
 
 .section .data
@@ -123,7 +165,8 @@ laneArray:
 tile struct
 */
 tile:
-	.int	0		// side (0)/road (1)
-	.int	0		// fuel(3)/bernie(2)/player/(1)/none(0)
-	.int	0		// 
+	.int	0		// side/road (0/1)
+	.int	0		// player (0/1)
+	.int 	0		// fuel(1)/bernie(2)/none(0)
+	.int	0		//  
 	.int	0		// 
