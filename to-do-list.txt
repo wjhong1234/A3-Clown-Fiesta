@@ -19,7 +19,7 @@ Short List:
     :: Keeping track of map and objects on map
   vi.   Item State
     :: Keeping track of the items on the map
-  vii.  Create Graphics
+  vii.  Create Graphics !!!!!  [COMPLETE]
     :: Actually creating what will be seen
   viii. Optimize
     :: To be added
@@ -84,7 +84,7 @@ Comprehensive List:
   v. Game Map
     / Form array map
       x Decide size of side and road
-      / Initialize array
+      x Initialize array
         COMMENT: MUST FIX THIS
       X Flag side tiles
       X Flag road tiles
@@ -106,7 +106,7 @@ Comprehensive List:
       x Start (text)
       x Choice marker
       x Creator names (text)
-    / Game
+    x Game
       x Background
         x Road
           x Decide what road should be
@@ -117,15 +117,15 @@ Comprehensive List:
           x American eagle
         REMOVED: o Right Side
           REMOVED: o Statue of Liberty
-      o Items on Road
-        o Player
-        o "Fuel" (toupe)
-        o "Cars" (still unsure)
-          o decide what antagonist should be
-    / Condition Screens
+      x Items on Road
+        x Player
+        x "Fuel" (toupe)
+        x "Cars" (still unsure)
+          x decide what antagonist should be
+    x Condition Screens
       x Lose screen
-      o Win screen
-    o Prompt Pop-up (pausing the game)
+      x Win screen
+    REMOVED: o Prompt Pop-up (pausing the game)
       o Resume (text)
       o Quit (text)
       
