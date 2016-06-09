@@ -34,14 +34,14 @@ tutorialPrint:
 
 	ldr	r0, =instr1
 	mov	r1, #17
-	ldr	r2, =0
+	ldr	r2, =7
 	ldr	r3, =0
 	ldr	r4, =0xFFFF
 	bl	printText
 
 	ldr	r0, =instr2
 	mov	r1, #14
-	ldr	r2, =0
+	ldr	r2, =7
 	ldr	r3, =15
 	ldr	r4, =0xFFFF
 	bl	printText
