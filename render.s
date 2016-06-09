@@ -132,100 +132,6 @@ noPixel$:
 
 	pop		{r4-r10, pc}
 
-.globl	writeLife
-	.equ	LIFE_X, 710
-	.equ	LIFE_Y, 40
-	INPUT .req r4
-	LIFE .req r5
-writeLife:
-	push	{r4-r10, lr}
-
-	mov	INPUT, r0
-	mov	LIFE, #48	// initialize one's place to decimal number of '0'
-	add	LIFE, INPUT
-
-	mov	r0, LIFE
-	ldr	r1, =0xFFFF	// arg 2: colour of string
-	ldr	r2, =LIFE_X	// arg 3: x-coord
-	ldr	r3, =LIFE_Y	// arg 4: y-coord
-	
-	bl	DrawChar	// prints one char
-
-	pop	{r4-r10, lr}
-	bx	lr
-
-.globl	writeFuel
-/*
-writeFuel
-Writes numbers on screen
-r0 - number
-*/
-	.equ	FUEL_X, 570
-	.equ	FUEL_Y, 40
-	NUM .req r4
-	HUND .req r5
-	TEN .req r6
-	ONE .req r7
-	
-writeFuel:
-	push	{r4-r10, lr}
-	
-	mov	NUM, r0
-
-	mov	HUND, #48	// initialize hundred's place to decimal number of '0'
-	mov	TEN, #48	// initialize ten's place to decimal number of '0'
-	mov	ONE, #48	// initialize one's place to decimal number of '0'
-	
-	ldr	r0, =1000
-	cmp	NUM, r0		// if the number is more than 999 (x >= 1000) 
-	addge	HUND, #9	// then set the hundreds, tens, and ones
-	addge	TEN, #9		// to nine, and branch to print
-	addge	ONE, #9
-	bge	printNum
-
-getHundred:
-	cmp	NUM, #100	
-	subge	NUM, #100	// if the number >= 100, then		
-	addge	HUND, #1	// add 1 to hundreds
-	bge	getHundred	// keep looping until number < 100
-
-getTen:
-	cmp	NUM, #10	
-	subge	NUM, #10	// if the number >= 10, then		
-	addge	TEN, #1		// add 1 to tens
-	bge	getTen		// keep looping until number < 10
-
-getOne:
-	cmp	NUM, #1	
-	subge	NUM, #1		// if the number >= 0, then		
-	addge	ONE, #1		// add 1 to ones
-	bge	getOne		// keep looping until number < 1
-	
-printNum:
-	mov	r8, #2		// if looking for fuel numbers
-	ldr	r9, =FUEL_X	// initialize x-coordinate
-
-printNumLoop:
-	ldr	r1, =0xFFFF	// arg 2: colour of string
-	mov	r2, r9		// arg 3: x-coord
-	ldr	r3, =FUEL_Y	// arg 4: y-coord
-
-	subs	r8, #1		// flag
-	movne	r0, HUND	// 2 - 1 = positive flag (ne)
-	moveq	r0, TEN		// 1 - 1 = zero flag (eq)
-	movmi	r0, ONE		// 0 - 1 = negative flag (mi)
-	
-	bl	DrawChar	// prints one char
-				
-	add	r9, #8		// move to next one or something
-
-	cmp	r8, #-1
-	beq	printNumEnd
-	b	printNumLoop
-
-printNumEnd:
-	pop	{r4-r10, lr}
-	bx	lr
 
 /* 
 	After this point, these functions will draw specific
@@ -244,22 +150,36 @@ render:
 
 
 
-// work in progress
-.globl	drawRoad
-	.equ	RIGHT, 864	// rightmost edge of the road
-	.equ	LEFT, 352	// leftmost edge of the road
-	.equ	CENTRE, 512	// center of road
-				
-				
-	.equ	SPACE, 6	// the space between the white road marks
-drawRoad:
+.globl	drawGame
+	ROW .req r4
+	COL .req r5
+	.equ	ROAD, 0
+drawGame:
 	push	{r4-r10, lr}
+	mov	ROW, #0
+	mov	COL, #0
+
+drawGameLoop:
+	mov	r0, COL
+	mov	r1, ROW
+	bl	getTileRef	// check if tile is a side or a road
+	cmp	r0, #ROAD
+	ldreq	r4, =road_tile	// draw road if road
+	ldrne	r4, =grass_tile	// draw grass if grass
+
+	mov	r0, COL
+	mov	r1, ROW
+	bl	getTileCoord	// retrieve tile coordinates
+	mov	r2, r4		// move address of image
+	bl	drawTile
+			
+	add	COL, #1		// increase the column
+	cmp	COL, #24	// check if reached rightmost column
+	movge	COL, #0		// if so, return to beginning
+	addge	ROW, #1		// and go to next row
+	cmp	ROW, #21	// check if reached bottom-most row
+	ble	drawGameLoop	// if not, keep looping
 	
-	ldr	r5, =CENTRE	
-	sub	r0, r5, #16	// center - 16 = leftmost edge of road mark
-	mov	r1, #4444
-	add	r2, r5, #16	// center + 16 = rightmost edge of road mark
-	add	r3, r1, #32	// the bottom-most edge of the tile
 	pop	{r4-r10, lr}
 	bx	lr
 
@@ -292,15 +212,14 @@ drawFace:
 drawTile
 Draws specific tiles (32 x 32)
 
-r0 - tile address
-r1 - x coordinate
-r2 - y coordinate
+r0 - x coordinate
+r1 - y coordinate
+r2 - tile address
 */
+	
 drawTile:
 	push	{r4, lr}
-	mov	r4, r0		// move address (r0) to arg 4
-	mov	r0, r1		// move	x coordinate (r1) to arg 0
-	mov	r1, r2		// move y coordinate (r2) to arg 1
+	mov	r4, r2		// move address (r0) to arg 4
 	add	r2, r0, #32	// x + 32 = x final
 	add	r3, r1, #32	// y + 32 = y final
 	bl	CreateImage

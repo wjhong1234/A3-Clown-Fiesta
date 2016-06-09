@@ -24,9 +24,10 @@
 	// The outer edges of the map
 	.equ	LEFT, 352
 	.equ	RIGHT, 864
+	.equ	END, 22 * 10
 
 
-.globl	gameStart
+.globl	game
 	ACTION .req r6
 	PLAY .req r7
 /*
@@ -40,7 +41,7 @@ game:
 
 gameStart:
 	mov	PLAY, #0	// set it so game has not started
-	// bl	resetGame	// resets all aspects of game
+	bl	initGame	// resets all aspects of game
 
 gameLoop:
 	bl	getInput	// get input of player
@@ -72,7 +73,7 @@ gameLoop:
 				// then keep looping
 				// 0 - 1 = negative flag (mi)
 				// 1 - 1 = zero flag (eq)
-				// 2 - 1 = positive flag (pl)
+				// 2 - 1 = positive flag (ne)
 */
 
 gameEnd:
@@ -127,7 +128,7 @@ checkButtons:
 	moveq	ACTION, #RESTART
 
 	mov	r0, BUTTON	// SELECT - exit to main
-	ldr	r1, =SELECT	
+	ldr	r1, =SEL	
 	bl	checkButton	
 	cmp	r0, #1
 	moveq	ACTION, #EXIT
@@ -174,6 +175,10 @@ r2 - amount of fuel (might be zero if loss)
 */
 updateState:
 	HIT_FLAG .req r5	// 0 if not hit, 1 if hit
+	LIVES .req r6
+	FUEL .req r7
+	MAP_Y .req r8
+	P_X .req r9
 
 	push 	{r4-r10, lr}
 
