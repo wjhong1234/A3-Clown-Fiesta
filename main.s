@@ -14,14 +14,14 @@ main:
 
 mainmenu:
 	bl	menu
-	mov	r4, r0
-	cmp	r4, #1
-	blne	clearScreen
-	blne	haltLoop$
+	mov	r5, r0
+	bl	clearScreen
+	cmp	r5, #1
+	bne	haltLoop$
 
 	mov	r0, #7		// initial x
 	mov	r1, #64		// initial y
-	ldr	r2, =1023	// final x
+	ldr	r2, =223	// final x
 	ldr	r3, =767	// final y
 	ldr	r4, =banner
 	bleq	CreateImage
