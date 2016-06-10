@@ -166,7 +166,7 @@ isEnd:
 
 .globl gameMap
 gameMap:
-	.skip 	22 * 25 * 3 * 4 // 22 * 25 tiles (3 variables)
+	.skip 	22 * 25 * 4 * 4 // 22 * 25 tiles (4 variables)
 .globl	tilePassed
 tilePassed:
 	.int	0
@@ -182,3 +182,4 @@ tile:
 	.int	0		// side/road (0/1)
 	.int	0		// x coord
 	.int	0		// y coord
+	.int	0		// checks if there's an extra on the tile
