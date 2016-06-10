@@ -14,19 +14,13 @@ main:
 
 mainmenu:
 	bl	menu
-	mov	r5, r0
-	bl	clearScreen
-	cmp	r5, #1
-	bne	haltLoop$
+	mov	r4, r0
+	cmp	r4, #1
+	
+	bleq	game
 
-	mov	r0, #7		// initial x
-	mov	r1, #64		// initial y
-	ldr	r2, =223	// final x
-	ldr	r3, =767	// final y
-	ldr	r4, =banner
-	bleq	CreateImage
-	bleq	tutorialPrint
-	bleq	pressAPrint
+	bleq	drawBanner
+	blne	clearScreen
     
 haltLoop$:
 	b		haltLoop$

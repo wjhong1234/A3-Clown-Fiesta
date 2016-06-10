@@ -12,40 +12,39 @@ Instance of game environment
 	.equ 	UPPERMOST, 64
 .section .text
 	// adjust the latter number where necessary
-	.equ	END, 24 * 8	// end of the map
-	
-	MAP_Y .req r4
-	
-
-/*
-mapState:
-	
-
-updateMap:
-*/	
+	.equ	END, 22 * 8	// end of the map	
 
 /*
 Redraws center lane tile thing.
 */
-	r5 .req ROW
-	r4 .req COL
+
+	ADRS .req r6
+	ROW .req r5
+	COL .req r4
 updateRoad:
 	push	{r4-r10, lr}
 	
+	ldr	ADRS, =laneArray// retrieve lane array
 	mov	COL, #CENTER	// retrieve center tile
 	mov	ROW, #0		// retrieve top
 roadLoop:
+	ldr	r0, [ADRS]	
+	mov	r0, COL
+	mov	r1, ROW
+	bl	drawTile	
+
 	ldr	r2,  =road
 	mov	r0, COL		//
 	mov	r1, ROW 	// 
-	bl	getTileCoord
+	bl	getTileCoord	// retrieve coordinate
 	ldr	r2, =LANE
 	mov	r0, 
 	bl	drawTile
-	
 
 	pop	{r4-r10, lr}
 	bx	lr
+	.unreq	ROW
+	.unreq	COL
 
 .globl	getTileRef
 /*
@@ -62,7 +61,7 @@ r0 - address offset of the tile
 getTileRef:
 	push	{r4-r10, lr}
 	
-	ldr	r3, =gameMap			// retrieve map reference
+	ldr	r3, =gameMap		// retrieve map reference
 	// X * 25 (32 (2^5) - 7 (2^3 - 2^0)) + Y
 	// map[x][y] = MAX_COL*x + y	
 	lsl	OFFSET, r0, #5		// X * 32
@@ -73,43 +72,49 @@ getTileRef:
 	
 	pop	{r4-r10, lr}
 	bx	lr
-
-.globl	getTileCoord
-/*
-getTileCoord
-Retrieves tile coordinates based on the row and column.
-r0 - column
-r1 - row
-
-Returns:
-r0 - x coordinate
-r1 - y coordinate
-*/
-	.equ	X_OFF, 7 // accounts for trump on the left
-getTileCoord:
-	add	r0, #X_OFF
-	add	r1, #X_OFF
-	lsl	r0, #5		// column * 32 
-	lsl	r1, #5		// row * 32
-	bx	lr
+	.unreq	OFFSET
 
 
 .globl	getOverlap
 /*
 getOverlap
-Retrieves type of the overlapping item if it exists.
-If it doesn't exist, then it will return a 0.
+Retrieves reference of possible overlapping item.
+Returns 0 if none available.
 
-r0 - None/Fuel/Car (0/1/2)
+Returns:
+r0 - reference of item
 */
+	COUNT .req r1
+	S_ADRS .req r2
+	BASE_ADRS .req r3
+	P_ROW .req r4
+	P_COL .req r5
+getOverlap:
 	push	{r4-r10, lr}
 
-	ldr	r1, =player	// retrieve player reference
-	ldr	r0, [r1, #4]	// load column of player
-	mov	r1, #22		// retrieve row of player
-	bl	getTileRef	// retrieve tile reference
-	ldr	r1, [r0, #8]	// load possible item flag
-	mov	r0, r1		// return the item flag
+	ldr	r2, =player		// retrieve player reference
+	ldr	P_COL, [r2]		// load column of player
+	ldr	P_ROW, [r2, #4]		// load row of player
+	ldr	BASE_ADRS, =spawnArray	// 
+	mov	COUNT, #0		// the counter along the array
+overlapLoop:
+	add	S_ADRS, COUNT, COUNT, lsl #1		// counter * 3
+	add	S_ADRS, BASE_ADRS, S_ADRS, lsl #2	// adrs = base + offset (count * 3 * 4)
+	ldr	r6, [S_ADRS, #4]			// retrieve row
+	cmp	r6, P_ROW			// compare spawn's row and player's row
+	ldreq	r6, [S_ADRS]		// if the same, retrieve the column
+	cmpeq	r6, P_COL			// and compare spawn's and player's column.
+	moveq	r0, S_ADRS		// if the same, return the address of the spawn
+	beq	overlapEnd		// and branch to end of function
+
+	add	COUNT, #1		// if not the same, increment counter
+	ldr	r6, =itemCount		// retrieve item count
+	ldr	r0, [r6]
+	cmp	COUNT, r0		// compare the count and the item count
+	blt	overlapLoop		// if counter < item count, keep looping 
+	mov	r0, #0			// return 0 if no overlap
+
+overlapEnd:
 	
 	pop	{r4-r10, lr}
 	bx	lr
@@ -126,13 +131,33 @@ r0 - 0 if false, 1 if true
 hasCollide:
 	push	{r4-r10, lr}
 	ldr	r1, =player		// retrieve player reference
-	ldr	r0, [r1, #4]		// load column of player
+	ldr	r0, [r1, #4]	// load column of player
 	mov	r1, #22			// retrieve row of player
 	bl	getTileRef		// retrieve tile reference
 	ldr	r1, [r0]		// load tile type
 	cmp	r1, #0			// check if tile is side
-	moveq	r0, #1			// return true if side
-	movne	r0, #0			// return false if not
+	moveq	r0, #1		// return true if side
+	movne	r0, #0		// return false if not
+	pop	{r4-r10, lr}
+	bx	lr
+
+.globl	isEnd
+/*
+isEnd
+Checks if the map has reached the end.
+
+Returns:
+r0 - 0 if false, 1 if true
+*/
+isEnd:
+	push	{r4-r10, lr}
+
+	ldr	r0, =tilePassed
+	ldr	r1, =END
+	cmp	r0, r1
+	movge	r0, #1
+	movlt	r0, #0
+
 	pop	{r4-r10, lr}
 	bx	lr
 
@@ -141,23 +166,12 @@ hasCollide:
 
 .globl gameMap
 gameMap:
-	.skip 22 * 25 * 4 // 22 * 25
+	.skip 	22 * 25 * 3 * 4 // 22 * 25 tiles (3 variables)
+.globl	tilePassed
+tilePassed:
+	.int	0
 
-/*
-.globl leftSide
-.globl rightSide
-.globl road
-
-leftSide:
-	.skip 264 * 4	// 5 * 22 tiles
-	.end
-rightSide:
-	.skip 120 * 4	// 5 * 22 tiles 
-	.end
-road:
-	.skip 384 * 4	// 15 * 22 tiles
-	.end
-*/		
+.globl	laneArray
 laneArray:
 	.skip 22 * 4	// contains reference of lane or road
 	
@@ -166,7 +180,5 @@ tile struct
 */
 tile:
 	.int	0		// side/road (0/1)
-	.int	0		// player (0/1)
-	.int 	0		// fuel(1)/bernie(2)/none(0)
-	.int	0		//  
-	.int	0		// 
+	.int	0		// x coord
+	.int	0		// y coord

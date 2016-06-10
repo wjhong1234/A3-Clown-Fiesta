@@ -1,7 +1,7 @@
 .section .text
-.globl	tutorialPrint
+.globl	initPrint
 
-tutorialPrint:
+initPrint:
 	push	{r4-r10, lr}
 
 	ldr	r0, =fuel
@@ -96,12 +96,14 @@ promptPrint:
 .globl	writeLife
 	.equ	LIFE_X, 710
 	.equ	LIFE_Y, 40
-	INPUT .req r4
+	
 	LIFE .req r5
 writeLife:
 	push	{r4-r10, lr}
 
-	mov	INPUT, r0
+	ldr	r0, =player
+	ldr	INPUT, [player, #12]// retrieve life
+
 	mov	LIFE, #48	// initialize one's place to decimal number of '0'
 	add	LIFE, INPUT
 
@@ -117,9 +119,7 @@ writeLife:
 
 .globl	writeFuel
 /*
-writeFuel
-Writes numbers on screen
-r0 - number
+Writes the fuel.
 */
 	.equ	FUEL_X, 570
 	.equ	FUEL_Y, 40
@@ -131,7 +131,8 @@ r0 - number
 writeFuel:
 	push	{r4-r10, lr}
 	
-	mov	NUM, r0
+	ldr	r0, =player
+	ldr	NUM, [player, #8]// retrieve fuel
 
 	mov	HUND, #48	// initialize hundred's place to decimal number of '0'
 	mov	TEN, #48	// initialize ten's place to decimal number of '0'

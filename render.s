@@ -89,40 +89,40 @@ DrawChar:
 	row	.req	r7
 	mask	.req	r8
 
-	mov		r9,	r0
-	ldr		chAdr,	=font		// load the address of the font map
-	add		chAdr,	r9, lsl #4	// char address = font base + (char * 16)
-	mov		py,	r3		// init the Y coordinate (pixel coordinate)
-	mov		r9,	r2		// save X coordinate at register 9
-	mov		r10, 	r1		// save colour at register 10
+	mov	r9, r0
+	ldr	chAdr, =font		// load the address of the font map
+	add	chAdr, r9, lsl #4	// char address = font base + (char * 16)
+	mov	py, r3			// init the Y coordinate (pixel coordinate)
+	mov	r9, r2			// save X coordinate at register 9
+	mov	r10, r1			// save colour at register 10
 
 charLoop$:
-	mov		px,	r9			// init the X coordinate
+	mov	px, r9			// init the X coordinate
 
-	mov		mask,	#0x01		// set the bitmask to 1 in the LSB
+	mov	mask, #0x01		// set the bitmask to 1 in the LSB
 	
-	ldrb	row,	[chAdr], #1	// load the row byte, post increment chAdr
+	ldrb	row, [chAdr], #1	// load the row byte, post increment chAdr
 
 rowLoop$:
-	tst		row,	mask		// test row byte against the bitmask
-	beq		noPixel$
+	tst	row, mask		// test row byte against the bitmask
+	beq	noPixel$
 
-	mov		r0,		px
-	mov		r1,		py
-	mov		r2,		r10		// red
-	bl		DrawPixel			// draw red pixel at (px, py)
+	mov	r0, px
+	mov	r1, py
+	mov	r2, r10			// red
+	bl	DrawPixel		// draw red pixel at (px, py)
 
 noPixel$:
-	add		px,		#1			// increment x coordinate by 1
-	lsl		mask,	#1			// shift bitmask left by 1
+	add	px, #1			// increment x coordinate by 1
+	lsl	mask, #1		// shift bitmask left by 1
 
-	tst		mask,	#0x100		// test if the bitmask has shifted 8 times (test 9th bit)
-	beq		rowLoop$
+	tst	mask, #0x100		// test if the bitmask has shifted 8 times (test 9th bit)
+	beq	rowLoop$
 
-	add		py,		#1			// increment y coordinate by 1
+	add	py, #1			// increment y coordinate by 1
 
-	tst		chAdr,	#0xF
-	bne		charLoop$			// loop back to charLoop$, unless address evenly divisibly by 16 (ie: at the next char)
+	tst	chAdr,	#0xF
+	bne	charLoop$		// loop back to charLoop$, unless address evenly divisibly by 16 (ie: at the next char)
 
 	.unreq	chAdr
 	.unreq	px
@@ -138,39 +138,62 @@ noPixel$:
 	parts of the game.
 */
 
-/*
-render
+.globl	initDraw
+initDraw:
+	push	{r4-r10, lr}
+	bl	drawBanner
+	bl	drawMap
+	bl	initPrint
+	pop	{r4-r10, lr}
+	bx	lr
 
-This draws everything based on the game's state
-*/
+
+.globl	render
 render:
-	push	{r4}
-	pop		{r4}
-	bx		lr
+	push	{r4-r10, lr}
+	bl	drawFace
+	bl	writeFuel
+	bl	writeLife
 
+	bl	drawCentre
+//	bl	drawPainfulToImplementFlags
+	bl	drawSpawn
+	bl	drawPlayer
 
+	pop	{r4-r10, lr}
+	bx	lr
 
-.globl	drawGame
+.globl	drawMap
 	ROW .req r4
 	COL .req r5
+	ADRS .req r6
 	.equ	ROAD, 0
-drawGame:
+	.equ	CENTER, 13
+drawMap:
 	push	{r4-r10, lr}
 	mov	ROW, #0
 	mov	COL, #0
 
-drawGameLoop:
+drawMapLoop:
 	mov	r0, COL
 	mov	r1, ROW
 	bl	getTileRef	// check if tile is a side or a road
-	cmp	r0, #ROAD
-	ldreq	r4, =road_tile	// draw road if road
-	ldrne	r4, =grass_tile	// draw grass if grass
+	ldr	r1, [r0]	// load tile type	
+	cmp	r1, #ROAD
+	ldreq	r3, =road_tile	// draw road if road
+	ldrne	r3, =grass_tile	// draw grass if grass
 
-	mov	r0, COL
-	mov	r1, ROW
-	bl	getTileCoord	// retrieve tile coordinates
-	mov	r2, r4		// move address of image
+	cmp	COL, #CENTRE	// check if at centre
+	lsleq	r1, ROW, #2	// offset of laneArray
+	ldreq	r4, =laneArray	// retrieve lane array
+	ldreq	r5, [r4, r1]	
+	cmpeq	r5, #1		// check if it has a white flag
+	ldreq	r3, =lane_tile	// if so, mark it as lane
+
+	mov	ADRS, r0	// move address
+	ldr	r0, [ADRS, #4]	// retrieve x
+	ldr	r1, [ADRS, #8]	// retrieve y
+	mov	r2, r3		// move address of image
 	bl	drawTile
 			
 	add	COL, #1		// increase the column
@@ -178,7 +201,7 @@ drawGameLoop:
 	movge	COL, #0		// if so, return to beginning
 	addge	ROW, #1		// and go to next row
 	cmp	ROW, #21	// check if reached bottom-most row
-	ble	drawGameLoop	// if not, keep looping
+	ble	drawMapLoop	// if not, keep looping
 	
 	pop	{r4-r10, lr}
 	bx	lr
@@ -204,6 +227,17 @@ drawFace:
 	ldr	r3, =755	// final y
 	bl	CreateImage
 	
+	pop	{r4, lr}
+	bx	lr
+
+drawBanner:
+	push	{r4, lr}	
+	mov	r0, #7		// initial x
+	mov	r1, #64		// initial y
+	ldr	r2, =223	// final x
+	ldr	r3, =767	// final y
+	ldr	r4, =banner
+	bleq	CreateImage
 	pop	{r4, lr}
 	bx	lr
 
@@ -307,21 +341,4 @@ image:
 	.int 0	// initial y
 	.int 0	// final y
 
-.globl fuel
-fuel: .ascii "FUEL:"	// 5
-.globl life
-life: .ascii "LIVES:"	// 6
-.globl tuto1
-tuto1: .ascii "GET TRUMP TO THE WHITE HOUSE!"	// 29
-.globl tuto2
-tuto2: .ascii "AVOID BERNIE, COLLECT TOUPEES"	// 29
-.globl instr1
-instr1: .ascii "SELECT: MAIN MENU"	// 17
-.globl instr2
-instr2: .ascii "START: RESTART"	// 14
-.globl pressA
-pressA: .ascii "PRESS A TO START"	// 16
-.globl dsclm
-dsclm: .ascii "We are not Trump supporters."	// 28
-.globl contPrompt
-contPrompt: .ascii "PRESS ANY BUTTON TO CONTINUE"	// 28
+
