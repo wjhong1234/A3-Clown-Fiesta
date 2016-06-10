@@ -54,16 +54,16 @@ Comprehensive List:
     / Track loss
       / Contact
       x No more fuel
-    / Track win
-      / Reach end
+    x Track win
+      x Reach end
       COMMENT: FIGURE OUT WHERE MAP ENDS?
-    o Track amount traveled (?)
-    / Fuel effect
-      / Increase: Fuel item
-      o Decrease: Time/Pressing A
-    / Contact effect (lose 10 fuel, one life)
-      o Car
-      / Side tile
+    x Track amount traveled (?)
+    x Fuel effect
+      x Increase: Fuel item
+      x Decrease: Time/Pressing A
+    x Contact effect (lose 10 fuel, one life)
+      x Car
+      x Side tile
       o Redraw at center
     / Item update
       / Randomly place items
@@ -72,12 +72,12 @@ Comprehensive List:
   
   iv. Game State
     o Initialize state
-    o Track items
-      o Cars
-      o Fuel
-    o Track player's status
-      o Lives
-      o Fuel units
+    x Track items
+      x Cars
+      x Fuel
+    x Track player's status
+      x Lives
+      x Fuel units
     x Track win condition
     x Track lose condition
 
@@ -89,10 +89,11 @@ Comprehensive List:
       X Flag side tiles
       X Flag road tiles
       o Flag if occupied with "fuel" or "car"
-    o Iffy
+    REMOVED: Iffy
       COMMENT: Will mentioned that it was weird to have it here. idk.
       o Place reference for fuel
       o Place reference for lives
+      COMMENT: Reference has been placed elsewhere
 
   vi. Item State
     o Track amount appeared
