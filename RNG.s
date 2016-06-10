@@ -1,5 +1,16 @@
 /*
+---IMPORTANT---
+About the "xorShift" function:
+	NO PARAMETERS: Everything it needs is in memory.
+	RETURNS IN R0: Produces a semi-randomly generated number.
+	USAGE: Call it where you need it and you get a random number returned in r0.
+
+---NOTES---
 a revised version of rng
+
+XORSHIFT PRODUCES A RANDOM NUMBER THAT IS HUGE.
+	- Please mask it to a smaller number for use.
+	- "LIMIT" register currently unused, but would be used to generally limit number size.
 */
 
 .globl	xorShift

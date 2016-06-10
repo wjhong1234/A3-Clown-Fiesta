@@ -54,14 +54,14 @@ movePlayer:
 	ldr	BASEADDRESS, =player		//load player attributes address
 	ldr	XPOSITION, [BASEADDRESS]	//load player xposition
 	
-	cmp	DIRECTION, LEFT			//compare direction to LEFT
+	cmp	DIRECTION, #LEFT			//compare direction to LEFT
 	beq	goLeft				//if equal branch to move left
 	bne	goRite				//if not equal branch to move right
 
-goLeft:	sub	XPOSITION, MOVE			//decrement xposition value
+goLeft:	sub	XPOSITION, #MOVE			//decrement xposition value
 	b	next
 
-goRite:	add	XPOSITION, MOVE			//increment xposition value
+goRite:	add	XPOSITION, #MOVE			//increment xposition value
 
 next:	str	XPOSITION, [BASEADDRESS]	//update xposition
 
@@ -79,14 +79,20 @@ next:	str	XPOSITION, [BASEADDRESS]	//update xposition
 resetPlayer:
 	
 	BASEADDRESS	.req	r0			//base address of player attributes
+	PARAMETER	.req	r1			//parameter register
 
 	ldr	BASEADDRESS, =player			//load player attributes address
-	str	DEFAULT_X, [BASEADDRESS], #4		//store default player xposition
-	str	DEFAULT_Y, [BASEADDRESS], #4		//store default player yposition
-	str	DEFAULT_FUEL, [BASEADDRESS], #4		//store default player fuel amount
-	str	DEFAULT_LIVES, [BASEADDRESS]		//store default player lives	
+	mov	PARAMETER, #DEFAULT_X
+	str	PARAMETER, [BASEADDRESS], #4		//store default player xposition
+	mov	PARAMETER, #DEFAULT_Y
+	str	PARAMETER, [BASEADDRESS], #4		//store default player yposition
+	mov	PARAMETER, #DEFAULT_FUEL
+	str	PARAMETER, [BASEADDRESS], #4		//store default player fuel amount
+	mov	PARAMETER, #DEFAULT_LIVES
+	str	PARAMETER, [BASEADDRESS]		//store default player lives	
 
 	.unreq	BASEADDRESS
+	.unreq	PARAMETER
 
 	bx	lr
 
@@ -97,12 +103,15 @@ resetPlayer:
 resetPlayerPosition:
 	
 	BASEADDRESS	.req	r0			//base address of player attributes
+	PARAMETER	.req	r1			//parameter register
 
 	ldr	BASEADDRESS, =player			//load player attributes address
-	str	DEFAULT_X, [BASEADDRESS]		//store default player xposition
+	mov	PARAMETER, #DEFAULT_X
+	str	PARAMETER, [BASEADDRESS]		//store default player xposition
 
 	.unreq	BASEADDRESS
-	
+	.unreq	PARAMETER
+
 	bx	lr
 
 .section .data

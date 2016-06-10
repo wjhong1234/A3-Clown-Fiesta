@@ -15,25 +15,27 @@ THE LOOP CONTROLS THE FPS OF THE GAME LOOP, AND REQUIRES THE CLOCK TIME OF THE S
 
 .section .text
 
-.equ	TIMEPERFRAME, 200000				//time per frame fixed at 200000 microseconds (5 FPS)
+.equ	DEFAULTTIMEPERFRAME, 200000			//time per frame fixed at 200000 microseconds (5 FPS)
+.equ	CLOCKADDRESS, 0x3f003004			//address of the clock
 
 FPSLoop:
 
-	CURRENTTIME	.req	r4	
+	CLOCK		.req	r3			//clock address
+	CURRENTTIME	.req	r4			//time right now
 	LASTFRAME	.req	r5			//time of the last frame
 	DELTA		.req	r6			//total change in time 
 	DIFFERENCE	.req	r7			//difference in time between current time and last frame time
+	TIMEPERFRAME	.req	r8			//time per frame
 
-	bl	*getTime				//get current system clock time
+	ldr	CLOCK, =CLOCKADDRESS			//load clock address
+	ldr	TIMEPERFRAME, =DEFAULTTIMEPERFRAME	//load time per frame
 
-	mov	LASTFRAME, r0				//initialize last frame to before loop start
+	ldr	LASTFRAME, [CLOCK]			//initialize last frame to before loop start
 	mov	DELTA, #0				//initialize delta to zero
 
-loop:	bl	*getTime				//get current system clock time
+loop:	ldr	CURRENTTIME, [CLOCK]			//get current system clock time
 
-	mov	CURRENTTIME, r0				//move output into register
 	sub	DIFFERENCE, CURRENTTIME, LASTFRAME	//difference = current time - last frame time
-
 	add	DELTA, DIFFERENCE			//add difference to delta
 
 	cmp	DELTA, TIMEPERFRAME			//compare total change to time per frame

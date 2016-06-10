@@ -78,7 +78,8 @@ spawn:
 	bgt	cont				//generate new number if tile count is zero
 
 	bl	xorShift			//generate a random number
-	and	REQUIRED, OUTPUT, MAX_ITEMS	//mask the returned number with #7
+	and	OUTPUT, #MAX_ITEMS		//mask the returned number with #7
+	mov	REQUIRED, OUTPUT		//using output register as a spare register
 
 	cmp	REQUIRED, #0			//compare item requirement to #1
 	addeq	REQUIRED, #1			//this ensures no items spawn instantly
@@ -90,7 +91,8 @@ spawn:
 cont:	ldr	BASEADDRESS, =lastTile		//load last tile address
 	ldr	PAST, [BASEADDRESS]		//load last tile
 
-	bl	countTiles			//get current tile count
+	ldr	BASEADDRESS, =tilePassed	//get current tile count
+	ldr	OUTPUT, [BASEADDRESS]
 
 	mov	CURRENT, OUTPUT			//move function output to CURRENT
 	sub	DIFFERENCE, CURRENT, PAST	//difference = current tile - last tile
@@ -103,26 +105,27 @@ cont:	ldr	BASEADDRESS, =lastTile		//load last tile address
 	bl	xorShift			//generate a random number
 	
 	mov	XPOSITION, OUTPUT		//output is the new x position
-	and	XPOSITION, MAX_POS		//mask the generated number to the map size (15)
-	add	XPOSITION, MAP_OFFSET		//add the map offset (5)
+	and	XPOSITION, #MAX_POS		//mask the generated number to the map size (15)
+	add	XPOSITION, #MAP_OFFSET		//add the map offset (5)
 	
 	bl	xorShift			//generate a random number
 
 	mov	ITEMTYPE, OUTPUT		//output is the new item type
-	and	ITEMTYPE, TYPE			//mask the generated number to an item type [0/1][fuel/obstacle]
+	and	ITEMTYPE, #TYPE			//mask the generated number to an item type [0/1][fuel/obstacle]
 
 	ldr	SPAWNARRAY, =spawnArray		//load spawn array address
 	ldr	BASEADDRESS, =itemCount		//load item count address
 	ldr	ITEMCOUNT, [BASEADDRESS]	//load item count
 
 	add	ITEMCOUNT, #1			//increment spawn array
-	mul	OFFSET, ITEMCOUNT, #12		//multiply item count by 12 (three items, four bytes each)
+	mov	OUTPUT, #12
+	mul	OFFSET, ITEMCOUNT, OUTPUT	//multiply item count by 12 (three items, four bytes each)
 	str	ITEMCOUNT, [BASEADDRESS]	//store incremented item count
 
 	add	SPAWNARRAY, OFFSET		//add the offset to the spawn array
 	str	XPOSITION, [SPAWNARRAY], #4	//store x position of new item
 	
-	mov	r0, INITIAL_Y			//move zero into r0
+	mov	r0, #INITIAL_Y			//move zero into r0
 	str	r0, [SPAWNARRAY], #4		//store default y position of new item
 
 	str	ITEMTYPE, [SPAWNARRAY]		//store item type of new item
@@ -169,7 +172,7 @@ movAll:	cmp	COUNTER, ITEMCOUNT		//compare item count to counter
 
 	ldr	ITEMY, [SPAWNARRAY, #4]!	//load item y position
 
-	add	ITEMY, MOVE			//move item down one tile
+	add	ITEMY, #MOVE			//move item down one tile
 	str	ITEMY, [SPAWNARRAY], #8		//update yposition of item
 	add	COUNTER, #1			//increment counter
 	b	movAll
@@ -190,6 +193,7 @@ fin:	bl	enforceFence			//remove items now off the map
 enforceFence:
 	push	{r4-r10, lr}
 
+	SPARE		.req	r1		//spare register
 	BASEADDRESS	.req	r2		//base address
 	SPAWNARRAY	.req	r3		//spawn array *address
 	ITEMX		.req	r4		//xposition of an itemi
@@ -211,7 +215,7 @@ fence:	cmp	COUNTER, ITEMCOUNT		//compare item count to counter
 	bge	gated				//end loop
 
 	ldr	ITEMY, [SPAWNARRAY, #4]!	//load item y position
-	cmp	ITEMY, BOTTOM_ROW		//compare item y position to bottom row
+	cmp	ITEMY, #BOTTOM_ROW		//compare item y position to bottom row
 	bge	deport				//if item isn't in map boundaries, remove item
 
 	add	SPAWNARRAY, #8			//add offset for next item search
@@ -224,7 +228,8 @@ deport:	sub	SPAWNARRAY, #4			//address correction
 	ldr	BASEADDRESS, =spawnArray	//load spawn array address
 
 	sub	OFFSET, ITEMCOUNT, #1		//decrement itemcount to calculate offset
-	mul	OFFSET, #12			//calculate offset for last item
+	mov	SPARE, #12
+	mul	OFFSET, SPARE			//calculate offset for last item
 
 	add	BASEADDRESS, OFFSET		//add offset to base address
 	ldr	ITEMX, [BASEADDRESS], #4	//load last item xposition
@@ -247,7 +252,8 @@ gated:	.unreq	BASEADDRESS
 	.unreq	ITEMCOUNT
 	.unreq	COUNTER
 	.unreq	OFFSET
-	
+	.unreq	SPARE
+
 	pop	{r4-r10}
 	bx	lr
 
@@ -269,12 +275,13 @@ obliterate:
 	COUNTER		.req	r6		//loop counter
 	OFFSET		.req	r7		//memory offset
 	ITEMTYPE	.req	r8		//type of item
+	SPARE		.req	r9		//spare register
 
 	ldr	BASEADDRESS, =player		//load player attribute address
 	ldr	XPOSITION, [BASEADDRESS]	//load player xposition
 
 	ldr	BASEADDRESS, =itemCount		//load item count address
-	ldr	ITEMCOUNT, =[BASEADDRESS]	//load item count
+	ldr	ITEMCOUNT, [BASEADDRESS]	//load item count
 
 	ldr	SPAWNARRAY, =spawnArray		//load spawn array address
 	mov	COUNTER, #0			//move zero into loop counter
@@ -290,13 +297,13 @@ loop:	cmp	COUNTER, ITEMCOUNT		//compare item count to loop counter
 	ldr	ITEMX, [SPAWNARRAY], #4		//load item xposition
 	ldr	ITEMY, [SPAWNARRAY], #4		//load item yposition
 
-	cmp	ITEMY, YPOSITION		//compare ypositions of player and item
-	bne	cont				//continue loop if not equal
+	cmp	ITEMY, #YPOSITION		//compare ypositions of player and item
+	bne	next				//continue loop if not equal
 
 	cmp	ITEMX, XPOSITION		//compare xpositions of player and item
 	beq	delete				//delete item from list if a match is found
 
-cont:	add	COUNTER, #1			//increment loop counter
+next:	add	COUNTER, #1			//increment loop counter
 	add	SPAWNARRAY, #4			//skip item type in memory
 	b	loop
 
@@ -306,7 +313,8 @@ delete:	sub	SPAWNARRAY, #8			//address correction for matching item
 	ldr	BASEADDRESS, =spawnArray	//load spawn array address
 
 	sub	OFFSET, ITEMCOUNT, #1		//decrement itemcount to calculate offset
-	mul	OFFSET, #12			//calculate offset for last item
+	mov	SPARE, #12
+	mul	OFFSET, SPARE			//calculate offset for last item
 
 	add	BASEADDRESS, OFFSET		//add offset to base address
 	ldr	ITEMX, [BASEADDRESS], #4	//load last item xposition
@@ -330,6 +338,7 @@ end:	ldr	BASEADDRESS, =itemCount		//load item count address
 	.unreq	COUNTER
 	.unreq	OFFSET
 	.unreq	ITEMTYPE
+	.unreq	SPARE
 
 	pop	{r4-r10}
 	bx	lr
