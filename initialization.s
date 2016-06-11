@@ -48,10 +48,11 @@ initCenter:
 	push	{lr}
 
 initCenterLoop:
-	cmp	r0, #0		// row mod 3		
-	subne	r0, #3
+	cmp	r0, #2		// row mod 3		
+	subgt	r0, #3
 	bgt	initCenterLoop	// keep going until row <= 0
 
+	cmp	r0, #0
 	moveq	r0, #1		// row mod 3 = 0 -> lane tile
 	movne	r0, #0		// otherwise, regular tile
 	pop	{lr}
@@ -61,10 +62,10 @@ initCenterLoop:
 	.equ 	ROAD, 0
 	.equ 	SIDE, 1
 	.equ 	LEFT, 4
-	.equ	CENTER, 13
-	.equ 	RIGHT, 19
-	.equ	X_OFF, 7 	// accounts for trump on the left
-	.equ	Y_OFF, 2 	// accounts for black spot at top
+	.equ	CENTER, 12
+	.equ 	RIGHT, 20
+	.equ	X_OFF, 7 	// accounts for banner on the left
+	.equ	Y_OFF, 2 	// accounts for scorecard at top
 	
 	COL .req r4
 	ROW .req r5
@@ -79,18 +80,25 @@ initMapLoop:
 	mov	r0, COL
 	mov	r1, ROW	
 	bl	getTileRef	// get offset of the tile in array
-	mov	ADRS, r0	
+	mov	ADRS, r0
 
-	// FIX THIS
 	mov	r1, #SIDE	// first check if side or road tile
-	cmp	COL, #LEFT	// if column > left
-	cmpgt	COL, #RIGHT	// if column < right
+	cmp	COL, #LEFT	// if column <= left
+	ble	strTile		// store grass
+	cmp	COL, #RIGHT	// if column < right
 	movlt	r1, #ROAD	// then it is on the road
+				// else print grass
+strTile:
 	str	r1, [ADRS]	// store tile type
 
-	cmp	COL, #13	// if it is a center tile,
+	cmp	COL, #CENTER	// if it is a center tile,
 	moveq	r0, ROW		// check if it is a lane tile.
-	bleq	initCenter	
+	bleq	initCenter
+	mov	r2, #0
+	mov	r3, #1
+	cmp	r0, #1		// if it is a line tile,
+	streq	r3, [ADRS, #12]	// store that it is a lane tile
+	strne	r2, [ADRS, #12] // else store that it is a normal tile
 			
 	add	r0, COL, #X_OFF	// account for left image
 	add	r1, ROW, #Y_OFF	// account for black box at top
@@ -100,7 +108,7 @@ initMapLoop:
 	str	r1, [ADRS, #8]	// store y
 
 	add	COL, #1		// increase the column
-	cmp	COL, #24	// check if reached rightmost column
+	cmp	COL, #25	// check if reached rightmost column
 	movge	COL, #0		// if so, return to beginning
 	addge	ROW, #1		// and go to next row
 	cmp	ROW, #21	// check if reached bottom-most row
@@ -114,6 +122,6 @@ initMapLoop:
 .globl player
 player:
 	.int	22 	// row
-	.int	13 	// column
+	.int	12 	// column
 	.int	100 	// fuel
 	.int	3 	// life

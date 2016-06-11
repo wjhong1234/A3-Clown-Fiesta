@@ -9,7 +9,6 @@
  * r1 - beginning of image on y axis
  * r2 - end of image on x axis
  * r3 - end of image on y axis
- * stack? - the ascii representation of the image's colors
  */
 
 CreateImage:
@@ -43,7 +42,7 @@ DrawLoop:
 	moveq	x, x_start	// and restart at the beginning	
 	addne	x, #1		// otherwise, continue rightward
 	cmp	y, y_final	// check if reached the desired y coordinate
-	blt	DrawLoop	// if not, keep looping
+	ble	DrawLoop	// if not, keep looping
 
 	pop 	{r4-r10, lr}
 	bx	lr
@@ -155,7 +154,7 @@ render:
 	bl	writeFuel
 	bl	writeLife
 
-//	bl	drawCentre
+//	bl	drawCenter
 //	bl	drawPainfulToImplementFlags
 //	bl	drawSpawn
 //	bl	drawPlayer
@@ -172,7 +171,7 @@ drawNewMap:
 	COL .req r5
 	ADRS .req r6
 	.equ	ROAD, 0
-	.equ	CENTER, 13
+	.equ	CENTER, 12
 drawMap:
 	push	{r4-r10, lr}
 	mov	ROW, #0
@@ -184,18 +183,13 @@ drawMapLoop:
 	bl	getTileRef	// check if tile is a side or a road
 	mov	ADRS, r0
 	ldr	r2, [ADRS]	// load the tile type
-	ldr	r1, [ADRS, #12]	// load to check if it's a special tile
-	cmp	r1, #0		// check if it's a special tile
-	bne	drawSpecial	// if it is, branch away to draw special tile
+	ldr	r1, [ADRS, #12]	// load to check if it's a lane tile
+	cmp	r1, #0		// check if it's a lane tile
+	ldrne	r3, =lane_tile	// if it is, branch away to draw lane tile
+	bne	drawCont
 	cmp	r2, #ROAD	// else, check if it's a road or side tile
 	ldreq	r3, =road_tile
 	ldrne	r3, =grass_tile
-	b	drawCont
-
-drawSpecial:
-	cmp	r2, #ROAD	// check if it is a road tile
-	ldreq	r3, =lane_tile
-	//ldrne	r3, =flag_tile	// this is for future addition of flag tile?
 
 drawCont:
 	ldr	r0, [ADRS, #4]	// retrieve x
@@ -204,7 +198,7 @@ drawCont:
 	bl	drawTile
 			
 	add	COL, #1		// increase the column
-	cmp	COL, #24	// check if reached rightmost column
+	cmp	COL, #25	// check if reached rightmost column
 	movge	COL, #0		// if so, return to beginning
 	addge	ROW, #1		// and go to next row
 	cmp	ROW, #21	// check if reached bottom-most row
@@ -216,7 +210,7 @@ drawCont:
 .globl	drawFace
 /*
 drawFace
-Draws faces of DT.
+Draws Trump's faces.
 r0 - state of Donald Trump
 0 - normal, 1 - collision, 2 - fuel
 */
@@ -249,7 +243,7 @@ drawBanner:
 	pop	{r4, lr}
 	bx	lr
 
-.globl	drawTiles
+.globl	drawTile
 /*
 drawTile
 Draws specific tiles (32 x 32)
@@ -331,7 +325,7 @@ clearLoop:
 	moveq	x, #0		// and restart at the beginning	
 	addne	x, #1		// otherwise, continue rightward
 	cmp	y, r5		// check if reached the desired y coordinate
-	blt	clearLoop	// if not, keep looping
+	ble	clearLoop	// if not, keep looping
 
 	pop 	{r4-r10, lr}
 	bx	lr
