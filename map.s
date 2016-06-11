@@ -186,7 +186,11 @@ tilePassed:
 gameMap:
 	.skip 	22 * 25 * 5 * 4 // 22 * 25 tiles (5 variables)
 	/*
-
+	1. flag showing whether side/road (0/1)
+	2. x coord
+	3. y coord
+	4. flag if there is something special drawn on it
+	5. flag if it has changed in the last iteration
 	*/
 	.end
 
@@ -194,12 +198,3 @@ gameMap:
 laneArray:
 	.skip 22 * 4	// contains reference of lane or road
 	.end
-/*
-tile struct
-*/
-/*
-	.int	0		// side/road (0/1)
-	.int	0		// x coord
-	.int	0		// y coord
-	.int	0		// if there is something special drawn on it
-	.int	0		// if it has changed in the last iteration
