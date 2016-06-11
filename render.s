@@ -265,22 +265,48 @@ drawBanner:
 	pop	{r4, lr}
 	bx	lr
 
-/*	
-		---- START FIXING THESE FUNCTIONS
+	SPAWNADRS	.req r4
+	COUNT		.req r5
+	OFFSET		.req r6
+	TILEADRS	.req r7
 drawSpawn:
-	push	{r4, lr}
+	push	{r4-r10, lr}
+	mov	COUNT, #0			// counter
+drawSpawnLoop:
+	lsl	OFFSET, COUNT, #2		// X * 4
+	sub	OFFSET, COUNT			// X * (4 - 1) = X * 3
+	ldr	r0, =spawnArray			// loading base address
+	ldr	SPAWNADRS, [r0, OFFSET, LSL#2]	// loading address of SPAWN X
 	
+	ldr	r0, [SPAWNADRS]
+	ldr	r1, [SPAWNADRS, #4]
+	bl	getTileRef
+	mov	TILEADRS, r0
 	
-	pop	{r4, lr}
+	ldr	r0, [SPAWNADRS, #8]
+	cmp	r0, #1
+	ldreq	r2, =bernie
+	ldrne	r2, =toupee
+	ldr	r0, [TILEADRS, #4]
+	ldr	r1, [TILEADRS, #8]
+	bl	drawTile
+
+	add	COUNT, #1
+	ldr	r3, =itemCount
+	ldr	r3, [r3]
+	cmp	COUNT, r3
+	blt	drawSpawnLoop
+	
+	pop	{r4-r10, lr}
 	bx	lr
 
+/*
 drawPlayer:
-	push	{r4, lr}
+	push	{r4-r10, lr}
 	
 	
-	pop	{r4, lr}
+	pop	{r4-r10, lr}
 	bx	lr
-		---- RIGHT HERE. DON'T MISS IT.
 */
 
 .globl drawFlags
