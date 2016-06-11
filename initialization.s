@@ -24,26 +24,40 @@ initi:
 	mov	r1, #1		// which utilizes an output function
 	bl	Init_GPIO
 
-	bl	initGame
-
 	pop	{r4-r10, lr}
 	bx	lr
 
 .globl	initGame
+	.equ	PAUSE, 0
 initGame:
 	push	{r4-r10, lr}
-
-	bl	initMap
-	//bl	drawMap
-
+	
+	bl	initMap			// initializes the map
+	bl	resetPlayer		// resets the player
+	bl	initState
 	pop	{r4-r10, lr}
 	bx	lr
+
+/*
+Initializes all states of the game.
+*/
+initState:
+	mov	r1, #0
+	ldr	r0, =itemCount	
+	str	r1, [r0]
+	ldr	r0, =status	
+	str	r1, [r0]
+	ldr	r0, =gameState		
+	str	r1, [r0]
+	ldr	r0, =faceState
+	str	r1, [r0]
+	bx	lr
+
 
 /*
 Initializes tile based on the row.
 r0 - row
 */
-.globl initCenter
 initCenter:
 	push	{lr}
 
@@ -116,12 +130,3 @@ strTile:
 
 	pop	{r4-r10, lr}
 	bx	lr
-
-.section .data
-.align
-.globl player
-player:
-	.int	22 	// row
-	.int	12 	// column
-	.int	100 	// fuel
-	.int	3 	// life
