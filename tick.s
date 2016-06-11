@@ -86,8 +86,6 @@ gameLoop:
 
 
 gameEnd:
-	// we need to figure out how we're going to pass
-	// all of this information into "render"
 	pop	{r4-r10, lr}
 	bx	lr
 
