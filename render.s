@@ -131,12 +131,30 @@ noPixel$:
 
 	pop		{r4-r10, pc}
 
+.globl	drawTile
+/*
+drawTile
+Draws specific tiles (32 x 32)
+
+r0 - x coordinate
+r1 - y coordinate
+r2 - tile address
+*/
+	
+drawTile:
+	push	{r4, lr}
+	mov	r4, r2		// move address (r0) to arg 4
+	add	r2, r0, #31	// x + 32 = x final
+	add	r3, r1, #31	// y + 32 = y final
+	bl	CreateImage
+
+	pop	{r4, lr}
+	bx	lr
 
 /* 
 	After this point, these functions will draw specific
 	parts of the game.
 */
-
 .globl	initDraw
 initDraw:
 	push	{r4-r10, lr}
@@ -153,18 +171,18 @@ render:
 	bl	drawFace
 	bl	writeFuel
 	bl	writeLife
-
-//	bl	drawCenter
+	
 //	bl	drawPainfulToImplementFlags
 //	bl	drawSpawn
 //	bl	drawPlayer
 
+	ldr	r0, =play	// check if the player has pressed A
+	ldr	r1, [r0]
+	cmp	r1, #0		// if the player hasn't pressed A, prompt for it
+	bleq	pressAPrint
+
 	pop	{r4-r10, lr}
 	bx	lr
-/*
-.globl	drawNewMap
-drawNewMap:
-*/	
 
 .globl	drawMap
 	ROW .req r4
@@ -217,7 +235,9 @@ r0 - state of Donald Trump
 drawFace:
 	push	{r4, lr}	
 	
-	subs	r0, #1		// check the status of face
+	ldr	r0, =trumpState	// Retrieves the current state of Trump
+	ldr	r1, [r0]	
+	subs	r1, #1		// check the status of face
 	ldreq	r4, =face_c	// collision (1) - 1 = zero flag (eq)
 	ldrne	r4, =face_f	// fuel (2) - 1 = positive flag (ne)
 	ldrmi	r4, =face_n	// normal (0) - 1 = negative flag (mi)
@@ -231,7 +251,9 @@ drawFace:
 	pop	{r4, lr}
 	bx	lr
 
-.globl	drawBanner
+/*
+Draws the banner on the left side of the game screen.
+*/
 drawBanner:
 	push	{r4, lr}	
 	mov	r0, #7		// initial x
@@ -243,27 +265,28 @@ drawBanner:
 	pop	{r4, lr}
 	bx	lr
 
-.globl	drawTile
-/*
-drawTile
-Draws specific tiles (32 x 32)
-
-r0 - x coordinate
-r1 - y coordinate
-r2 - tile address
-*/
-	
-drawTile:
+/*	
+		---- START FIXING THESE FUNCTIONS
+drawSpawn:
 	push	{r4, lr}
-	mov	r4, r2		// move address (r0) to arg 4
-	add	r2, r0, #31	// x + 32 = x final
-	add	r3, r1, #31	// y + 32 = y final
-	bl	CreateImage
-
+	
+	
 	pop	{r4, lr}
 	bx	lr
 
-.globl	drawFlags
+drawPlayer:
+	push	{r4, lr}
+	
+	
+	pop	{r4, lr}
+	bx	lr
+		---- RIGHT HERE. DON'T MISS IT.
+*/
+
+.globl drawFlags
+/*
+Draws the flags on the main menu.
+*/
 	.equ	START, 1
 drawFlags:
 	push	{r4-r10, lr}
@@ -290,7 +313,9 @@ drawFlags:
 	bx	lr
 
 .globl drawLose
-	
+/*
+Draws the lose screen.
+*/
 drawLose:
 	push	{r4, lr}	
 	
@@ -305,7 +330,9 @@ drawLose:
 	bx	lr
 
 .globl	clearScreen
-
+/*
+Clears the screen using one pixel.
+*/
 clearScreen:
 	push	{r4-r10, lr}
 	
