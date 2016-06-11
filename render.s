@@ -229,13 +229,12 @@ drawCont:
 /*
 drawFace
 Draws Trump's faces.
-r0 - state of Donald Trump
 0 - normal, 1 - collision, 2 - fuel
 */
 drawFace:
 	push	{r4, lr}	
 	
-	ldr	r0, =trumpState	// Retrieves the current state of Trump
+	ldr	r0, =faceState	// Retrieves the current state of Trump
 	ldr	r1, [r0]	
 	subs	r1, #1		// check the status of face
 	ldreq	r4, =face_c	// collision (1) - 1 = zero flag (eq)
@@ -272,11 +271,13 @@ drawBanner:
 drawSpawn:
 	push	{r4-r10, lr}
 	mov	COUNT, #0			// counter
+	ldr	r8, =spawnArray			// loading base address
 drawSpawnLoop:
+	// x * 3 + whatever you want
 	lsl	OFFSET, COUNT, #2		// X * 4
 	sub	OFFSET, COUNT			// X * (4 - 1) = X * 3
-	ldr	r0, =spawnArray			// loading base address
-	ldr	SPAWNADRS, [r0, OFFSET, LSL#2]	// loading address of SPAWN X
+	
+	add	SPAWNADRS, r8, OFFSET, LSL#2	// retrieving address of SPAWN X
 	
 	ldr	r0, [SPAWNADRS]
 	ldr	r1, [SPAWNADRS, #4]
@@ -284,7 +285,7 @@ drawSpawnLoop:
 	mov	TILEADRS, r0
 	
 	ldr	r0, [SPAWNADRS, #8]
-	cmp	r0, #1
+	cmp	r0, #1				// check if the item is bernie or toupee
 	ldreq	r2, =bernie
 	ldrne	r2, =toupee
 	ldr	r0, [TILEADRS, #4]
@@ -293,21 +294,31 @@ drawSpawnLoop:
 
 	add	COUNT, #1
 	ldr	r3, =itemCount
-	ldr	r3, [r3]
-	cmp	COUNT, r3
+	ldr	r2, [r3]
+	cmp	COUNT, r2
 	blt	drawSpawnLoop
 	
 	pop	{r4-r10, lr}
 	bx	lr
 
-/*
+	PLAYERADRS	.req r4
+	TILEADRS	.req r5
 drawPlayer:
 	push	{r4-r10, lr}
+	ldr	PLAYERADRS, =spawnArray		// loading base address
 	
+	ldr	r0, [PLAYERADRS]
+	ldr	r1, [PLAYERADRS, #4]
+	bl	getTileRef
+	mov	TILEADRS, r0
+	
+	ldr	r0, [TILEADRS, #4]
+	ldr	r1, [TILEADRS, #8]
+	ldr	r2, =player
+	bl	drawTile
 	
 	pop	{r4-r10, lr}
 	bx	lr
-*/
 
 .globl drawFlags
 /*
