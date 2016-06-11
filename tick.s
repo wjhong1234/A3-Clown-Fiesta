@@ -236,6 +236,9 @@ updateVar:
 	ldr	r0, =faceState		// Store Trump's current state in order to redraw his face
 	str	r1, [r0]
 	
+	cmp	HIT_FLAG, #1		// Reset player position if there was a collision
+	bleq	resetPlayerPosition	
+	
 	// here we check if the lose or win flags have been triggered
 updateGameState:
 	mov	r0, #0
