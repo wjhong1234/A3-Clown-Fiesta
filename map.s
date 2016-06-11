@@ -7,13 +7,13 @@ Instance of game environment
 		that are side tiles
 
 */
-	.equ	CENTER, 15
+	.equ	CENTER, 12
 	.equ 	LEFTMOST, 224
 	.equ 	UPPERMOST, 64
 	.equ	ROAD, 0
 	.equ	SIDE, 1
 .section .text
-	// adjust the latter number where necessary
+	// adjust the latter number as necessary
 	.equ	END, 22 * 8	// end of the map	
 /*
 
