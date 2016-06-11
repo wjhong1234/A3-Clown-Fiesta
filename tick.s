@@ -1,8 +1,4 @@
 .section .text
-
-	TEMP .req r4
-	BUTTON .req r6
-
 	// Buttons that will be accessed in the game
 	.equ	SEL, 0b110111111111	// Select button
 	.equ	START, 0b111011111111	// Start button
@@ -32,6 +28,7 @@
 .globl	game
 	PLAY 		.req r7
 	RESTART_FLAG	.req r8
+	BUTTON 		.req r6
 /*
 game
 
@@ -52,7 +49,7 @@ gameStart:
 	bl	initGame		// resets all aspects of game
 	
 	cmp	RESTART_FLAG, #1	// check if the player has decided to restart the game
-	beq	gameEnd		
+	beq	gameEnd			// if so, simply draw the map if necessary
 
 game:
 	bl	getInput		// get input of player
@@ -236,7 +233,7 @@ updateVar:
 	moveq	r1, #COLLISION
 	cmp	FUEL_FLAG, #1		// check if the player ran into fuel
 	moveq	r1, #FUEL
-	ldr	r0, =trumpState		// Store Trump's current state in order to redraw his face
+	ldr	r0, =faceState		// Store Trump's current state in order to redraw his face
 	str	r1, [r0]
 	
 	// here we check if the lose or win flags have been triggered
@@ -267,11 +264,11 @@ status:
 .globl	gameState
 // Checks if the player has chosen to quit
 gameState:
-	.int	1		
+	.int	1	
 	
-.globl	trumpState
+.globl	faceState
 // tracks which face Trump will make
-trumpState:				
+faceState:				
 	.int	0			// 0 - normal
 					// 1 - collision
 					// 2 - fuel
