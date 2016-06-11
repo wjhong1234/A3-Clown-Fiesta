@@ -64,7 +64,7 @@ gameLoop:
 	moveq	r1, #1		// move right if right
 	cmp	r1, #2		// if has moved
 	movne	r0, r1		// 
-	blne	movePlayer	// then change the position of player
+	//blne	movePlayer	// then change the position of player
 
 	// will need to figure out what to do if
 	// car hits the player before they can move?
@@ -185,7 +185,7 @@ updateState:
 	mov	LIVES, #0
 	mov	FUEL, #FUEL_LOSS// normally decrease fuel by 1
 	mov	MAP_Y, r3
-
+/*
 	bl	hasCollide	// check if player has hit the sides
 	cmp	r0, #1		// if the player has collided
 	moveq	HIT_FLAG, #1	// trigger hit flag
@@ -196,7 +196,7 @@ updateState:
 	moveq	HIT_FLAG, #1	// trigger collision
 	cmp	r0, #1		// if item is fuel, then
 	addeq	FUEL, #10	// add ten to fuel
-
+*/
 	cmp	HIT_FLAG, #0	// if the player has been hit
 	subne	LIVES, #1	// remove a life
 	subne	FUEL, #10	// remove 10 fuel	

@@ -10,13 +10,15 @@ Instance of game environment
 	.equ	CENTER, 15
 	.equ 	LEFTMOST, 224
 	.equ 	UPPERMOST, 64
+	.equ	ROAD, 0
+	.equ	SIDE, 1
 .section .text
 	// adjust the latter number where necessary
 	.equ	END, 22 * 8	// end of the map	
-
 /*
-Redraws center lane tile thing.
-*/
+
+// Redraws center lane tile thing.
+
 
 	ADRS .req r6
 	ROW .req r5
@@ -45,45 +47,57 @@ roadLoop:
 	bx	lr
 	.unreq	ROW
 	.unreq	COL
+*/
 
 .globl	getTileRef
 /*
 getTileRef
 
 Retrieves tile based on the row and the column.
-r0 - row
-r1 - column
+r0 - column
+r1 - row
 
 Returns
 r0 - address offset of the tile
 */
+	.equ	PARAM, 5
+	.equ	MAX_COL, 25
+	.equ	MAX_ROW, 22
 	OFFSET .req r2
 getTileRef:
 	push	{r4-r10, lr}
 	
 	ldr	r3, =gameMap		// retrieve map reference
 	// X * 25 (32 (2^5) - 7 (2^3 - 2^0)) + Y
-	// map[x][y] = MAX_COL*x + y	
-	lsl	OFFSET, r0, #5		// X * 32
-	sub	OFFSET, r0, lsl #3	// (X * 32) - (X * 8) = X * 24
-	add	OFFSET, r0		// (X * 26) + (X * 1) = X * 25
-	add	OFFSET, r1		// (X * 25) + Y 
-	mov	r0, OFFSET, lsl #2	// OFFSET * 4
+	// map[x][y] = [COL*MAX_COL*MAX_ITEM + ROW*MAX_ITEM] * 4
+	
+	mov	r4, #PARAM
+	mov	r5, #MAX_COL
+	mov	r6, #MAX_ROW
+	
+	// COL * MAX_COL [25] * MAX_ITEM [5]
+	mul	r0, r5
+	mul	r0, r4	
+	
+	// ROW * MAX_ITEM
+	mul	r1, r4
+	
+	add	r0, r1		
+	lsl	r0, #2
 	
 	pop	{r4-r10, lr}
 	bx	lr
 	.unreq	OFFSET
 
-
-.globl	getOverlap
 /*
-getOverlap
-Retrieves reference of possible overlapping item.
-Returns 0 if none available.
+.globl	getOverlap
 
-Returns:
-r0 - reference of item
-*/
+//getOverlap
+//Retrieves reference of possible overlapping item.
+//Returns 0 if none available.
+
+//Returns:
+//r0 - reference of item
 	COUNT .req r1
 	S_ADRS .req r2
 	BASE_ADRS .req r3
@@ -118,7 +132,7 @@ overlapEnd:
 	
 	pop	{r4-r10, lr}
 	bx	lr
-
+*/
 
 .globl	hasCollide
 /*
@@ -164,22 +178,28 @@ isEnd:
 .section .data
 	// total 22 * 25 tiles
 
-.globl gameMap
-gameMap:
-	.skip 	22 * 25 * 4 * 4 // 22 * 25 tiles (4 variables)
 .globl	tilePassed
 tilePassed:
-	.int	0
+	.int 0
+
+.globl gameMap
+gameMap:
+	.skip 	22 * 25 * 5 * 4 // 22 * 25 tiles (5 variables)
+	/*
+
+	*/
+	.end
 
 .globl	laneArray
 laneArray:
 	.skip 22 * 4	// contains reference of lane or road
-	
+	.end
 /*
 tile struct
 */
-tile:
+/*
 	.int	0		// side/road (0/1)
 	.int	0		// x coord
 	.int	0		// y coord
-	.int	0		// checks if there's an extra on the tile
+	.int	0		// if there is something special drawn on it
+	.int	0		// if it has changed in the last iteration

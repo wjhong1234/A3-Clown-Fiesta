@@ -15,11 +15,10 @@ main:
 mainmenu:
 	bl	menu
 	mov	r4, r0
+	bl	clearScreen
 	cmp	r4, #1
 	
-	bleq	game
-
-	bleq	drawBanner
+	bleq	drawMap
 	blne	clearScreen
     
 haltLoop$:

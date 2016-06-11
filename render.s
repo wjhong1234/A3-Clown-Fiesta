@@ -155,13 +155,17 @@ render:
 	bl	writeFuel
 	bl	writeLife
 
-	bl	drawCentre
+//	bl	drawCentre
 //	bl	drawPainfulToImplementFlags
-	bl	drawSpawn
-	bl	drawPlayer
+//	bl	drawSpawn
+//	bl	drawPlayer
 
 	pop	{r4-r10, lr}
 	bx	lr
+/*
+.globl	drawNewMap
+drawNewMap:
+*/	
 
 .globl	drawMap
 	ROW .req r4
@@ -178,19 +182,22 @@ drawMapLoop:
 	mov	r0, COL
 	mov	r1, ROW
 	bl	getTileRef	// check if tile is a side or a road
-	ldr	r1, [r0]	// load tile type	
-	cmp	r1, #ROAD
-	ldreq	r3, =road_tile	// draw road if road
-	ldrne	r3, =grass_tile	// draw grass if grass
+	mov	ADRS, r0
+	ldr	r2, [ADRS]	// load the tile type
+	ldr	r1, [ADRS, #12]	// load to check if it's a special tile
+	cmp	r1, #0		// check if it's a special tile
+	bne	drawSpecial	// if it is, branch away to draw special tile
+	cmp	r2, #ROAD	// else, check if it's a road or side tile
+	ldreq	r3, =road_tile
+	ldrne	r3, =grass_tile
+	b	drawCont
 
-	cmp	COL, #CENTRE	// check if at centre
-	lsleq	r1, ROW, #2	// offset of laneArray
-	ldreq	r4, =laneArray	// retrieve lane array
-	ldreq	r5, [r4, r1]	
-	cmpeq	r5, #1		// check if it has a white flag
-	ldreq	r3, =lane_tile	// if so, mark it as lane
+drawSpecial:
+	cmp	r2, #ROAD	// check if it is a road tile
+	ldreq	r3, =lane_tile
+	//ldrne	r3, =flag_tile	// this is for future addition of flag tile?
 
-	mov	ADRS, r0	// move address
+drawCont:
 	ldr	r0, [ADRS, #4]	// retrieve x
 	ldr	r1, [ADRS, #8]	// retrieve y
 	mov	r2, r3		// move address of image
@@ -230,6 +237,7 @@ drawFace:
 	pop	{r4, lr}
 	bx	lr
 
+.globl	drawBanner
 drawBanner:
 	push	{r4, lr}	
 	mov	r0, #7		// initial x
@@ -254,8 +262,8 @@ r2 - tile address
 drawTile:
 	push	{r4, lr}
 	mov	r4, r2		// move address (r0) to arg 4
-	add	r2, r0, #32	// x + 32 = x final
-	add	r3, r1, #32	// y + 32 = y final
+	add	r2, r0, #31	// x + 32 = x final
+	add	r3, r1, #31	// y + 32 = y final
 	bl	CreateImage
 
 	pop	{r4, lr}

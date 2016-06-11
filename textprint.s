@@ -95,17 +95,17 @@ promptPrint:
 
 .globl	writeLife
 	.equ	LIFE_X, 710
-	.equ	LIFE_Y, 40
-	
+	.equ	LIFE_Y, 40	
+
+
 	LIFE .req r5
 writeLife:
 	push	{r4-r10, lr}
 
 	ldr	r0, =player
-	ldr	INPUT, [player, #12]// retrieve life
+	ldr	r1, [r0, #16]// retrieve life
 
-	mov	LIFE, #48	// initialize one's place to decimal number of '0'
-	add	LIFE, INPUT
+	add	LIFE, r1, #48
 
 	mov	r0, LIFE
 	ldr	r1, =0xFFFF	// arg 2: colour of string
@@ -132,7 +132,7 @@ writeFuel:
 	push	{r4-r10, lr}
 	
 	ldr	r0, =player
-	ldr	NUM, [player, #8]// retrieve fuel
+	ldr	NUM, [r0, #12]// retrieve fuel
 
 	mov	HUND, #48	// initialize hundred's place to decimal number of '0'
 	mov	TEN, #48	// initialize ten's place to decimal number of '0'
