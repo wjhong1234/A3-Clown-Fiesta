@@ -29,6 +29,8 @@ xorShift:
 	ldr	BASEADDRESS, =rngArr	//load base address
 	ldr	T, [BASEADDRESS]	//load x into t
 
+	ldr	LIMIT, =65535		//mov the maximum size into limit register
+
 	eor	T, T, lsl #11		//t ^= t << 11 (^ is exclusive or)
 	eor	T, T, lsr #8		//t ^= t >> 8
 
@@ -39,10 +41,11 @@ xorShift:
 	ldr	W, [BASEADDRESS, #4]	//z = w
 	str	W, [BASEADDRESS], #4
 
-	eor	W, W, lsr #19		//w ^= w >> 19
+	eor	W, W, lsr #13		//w ^= w >> 19
 	eor	W, T			//w ^= t, returning W
+	and	W, LIMIT		//limit the size of the number
 
-	str	W, [BASEADDRESS, #4]	//store the w
+	str	W, [BASEADDRESS]	//store the w
 
 	mov	r0, W			//return w
 
@@ -58,5 +61,5 @@ xorShift:
 	bx	lr
 
 .section .data
-rngArr:	.int	1, 2, 3, 4		//an array of numbers initialized to 1, 2, 3, 4
+rngArr:	.int	7001, 9001, 83, 666	//an array of numbers initialized to 1, 2, 3, 4
 
