@@ -89,7 +89,6 @@ getTileRef:
 	bx	lr
 	.unreq	OFFSET
 
-/*
 .globl	getOverlap
 
 //getOverlap
@@ -132,7 +131,6 @@ overlapEnd:
 	
 	pop	{r4-r10, lr}
 	bx	lr
-*/
 
 .globl	hasCollide
 /*
