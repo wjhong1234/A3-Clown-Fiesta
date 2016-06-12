@@ -208,6 +208,9 @@ enforceFence:
 	ldr	ITEMCOUNT, [BASEADDRESS]	//load item count
 
 	mov	COUNTER, #0			//initialize loop counter
+	
+	cmp	ITEMCOUNT, #0			//check for items on list
+	ble	gated				//end function if nothing there
 
 //---------------------------------------------------------------------------------------------------//
 
@@ -288,6 +291,9 @@ obliterate:
 
 	cmp	ITEMCOUNT, #1			//check for items on list
 	beq	end				//branch to end if there's only one item
+	
+	cmp	ITEMCOUNT, #0			//check if nothing is on list
+	ble	endZ				//branch to end if nothing
 
 //---------------------------------------------------------------------------------------------------//
 
@@ -329,7 +335,7 @@ end:	ldr	BASEADDRESS, =itemCount		//load item count address
 	sub	ITEMCOUNT, #1			//decrement item count
 	str	ITEMCOUNT, [BASEADDRESS]	//update item count
 
-	.unreq	ITEMX
+endZ:	.unreq	ITEMX
 	.unreq	ITEMY
 	.unreq	XPOSITION
 	.unreq	BASEADDRESS
