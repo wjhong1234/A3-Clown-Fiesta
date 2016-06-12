@@ -335,32 +335,32 @@ drawSpawnLoop:
 	
 	add	SPAWNADRS, r8, OFFSET, LSL#2	// retrieving address of SPAWN X
 	
-	ldr	r0, [SPAWNADRS]
-	ldr	r1, [SPAWNADRS, #4]
-	sub	r1, #1
-	bl	getTileRef
+	ldr	r0, [SPAWNADRS]			// load X coord of spawn
+	ldr	r1, [SPAWNADRS, #4]		// load Y coord of spawn
+	sub	r1, #1				// ROW - 1 to get previous coord of spawn
+	bl	getTileRef			// get reference for Tile(X,Y)
 	mov	r3, r0
-	ldr	r0, [r3, #12]
+	ldr	r0, [r3, #12]			// checks whether the tile should be special or not
 	cmp	r0, #1
-	ldreq	r2, =lane_tile
-	ldrne	r2, =road_tile
-	ldr	r0, [r3, #4]
-	ldr	r1, [r3, #8]
-	bl	drawTile
+	ldreq	r2, =lane_tile			// if it is, print the special tile
+	ldrne	r2, =road_tile			// else, print the road tile
+	ldr	r0, [r3, #4]			// load previous X pixel of spawn
+	ldr	r1, [r3, #8]			// load previous Y pixel of spawn
+	bl	drawTile			// clear previous location of spawn
 	
-	ldr	r0, [SPAWNADRS]
+	ldr	r0, [SPAWNADRS]			// load coords of spawn
 	ldr	r1, [SPAWNADRS, #4]
 	bl	getTileRef
-	mov	TILEADRS, r0
+	mov	TILEADRS, r0			
 	ldr	r0, [SPAWNADRS, #8]
 	cmp	r0, #1				// check if the item is bernie or toupee
 	ldreq	r2, =bernie
 	ldrne	r2, =toupee
 	ldr	r0, [TILEADRS, #4]
 	ldr	r1, [TILEADRS, #8]
-	bl	drawTile
+	bl	drawTile			// draw new location of spawn
 
-	add	COUNT, #1
+	add	COUNT, #1			// loops through for remaining spawn
 	ldr	r3, =itemCount
 	ldr	r2, [r3]
 	cmp	COUNT, r2
@@ -406,7 +406,6 @@ drawPlayer:
 	cmp	r2, #0				
 	ldreq	r2, =road_tile			// if not special, draw a road tile
 	ldrne	r2, =lane_tile			// if special, then draw a lane tile
-
 eraseOld:
 	mov	r7, r0				// move tile reference
 	ldr	r0, [r7, #4]			// retrieve x coordinate
@@ -519,9 +518,4 @@ clearLoop:
 
 	pop 	{r4-r10, lr}
 	bx	lr
-
-.section .data
-
-.align 4
-font:		.incbin	"font.bin"
 
