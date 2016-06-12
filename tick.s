@@ -81,7 +81,8 @@ gameMove:
 	movne	r0, r1			
 	blne	movePlayer		// then update the position of player
 
-	bl	updateMap		// update map based on the input
+	bl	updateRoad		// update map based on the input
+//	bl	updateSpawn
 	bl	updateState		// update the state based on the map
 
 	ldr	r0, =status		// checks if the player has won or lost
@@ -165,7 +166,7 @@ checkButtons:
 updateMap:
 	push	{r4-r10, lr}
 	
-	// will call the functions in map.s
+	bl	updateRoad
 
 	pop	{r4-r10, lr}
 	bx	lr
