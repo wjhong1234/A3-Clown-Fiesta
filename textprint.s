@@ -56,10 +56,34 @@ pressAPrint:
 
 	ldr	r0, =pressA
 	mov	r1, #16
-	ldr	r2, =540
+	ldr	r2, =550
 	ldr	r3, =384
 	ldr	r4, =0xFFFF
 	bl	printText
+
+	pop 	{r4-r10, lr}
+	bx	lr
+
+	.equ	ROW, 10
+	COL	.req r4
+	ADRS	.req r5
+.globl pressAClear
+pressAClear:
+	push	{r4-r10, lr}
+
+	mov	COL, #9
+pressAClearLoop:
+	mov	r0, COL
+	mov	r1, #ROW
+	bl	getTileRef
+	mov	ADRS, r0
+	ldr	r0, [ADRS, #4]
+	ldr	r1, [ADRS, #8]
+	ldr	r2, =road_tile
+	bl	drawTile
+	add	COL, #1
+	cmp	COL, #15
+	ble	pressAClearLoop
 
 	pop 	{r4-r10, lr}
 	bx	lr
