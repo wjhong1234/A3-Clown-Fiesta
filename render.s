@@ -161,6 +161,8 @@ initDraw:
 	bl	drawBanner
 	bl	drawMap
 	bl	initPrint
+	bl	writeFuel
+	bl	writeLife
 	pop	{r4-r10, lr}
 	bx	lr
 
@@ -168,23 +170,71 @@ initDraw:
 .globl	render
 render:
 	push	{r4-r10, lr}
+	
+	ldr	r0, =status	// check if the player has lost or won
+	ldr	r1, [r0]
+	subs	r1, #1	
+	beq	renderNormal
+	blne	drawWin		
+	blmi	drawLose
+	b	renderEnd
+	/*
+	ne - one	(2 - 1) win
+	eq - zero	(1 - 1) lose
+	mi - negative	(0 - 1) normal state
+	*/
+renderNormal:
 	bl	drawFace
 	bl	writeFuel
 	bl	writeLife
-	
-//	bl	drawPainfulToImplementFlags
-//	bl	drawSpawn
-//	bl	drawPlayer
+	bl	drawNewMap
+	bl	drawSpawn
+	bl	drawPlayer
 
 	ldr	r0, =play	// check if the player has pressed A
 	ldr	r1, [r0]
 	cmp	r1, #0		// if the player hasn't pressed A, prompt for it
 	bleq	pressAPrint
-
+renderEnd:
+	pop	{r4-r10, lr}
+	bx	lr
+	
+	
+	COL	.req	r4
+	ROW	.req	r5
+	.equ	CENTER, #12
+drawNewMap:
+	push	{r4-r10, lr}
+	
+	mov	COL, #CENTER		// begins loop
+	mov	ROW, #0
+	
+drawNewMapLoop:
+	mov	r0, COL			// retrieve x and y coordinates of each tile
+	mov	r1, ROW 			
+	bl	getTileRef
+	ldr	r1, [r0, #16]
+	cmp	r1, #1			// if the tile has changed, then redraw it
+	mov	r1, #0
+	str	r1, [r0, #16]		// remove flag for change
+	
+	mov	r3, r0
+	ldr	r0, [r3, #4]		// x
+	ldr	r1, [r3, #8]		// y
+	ldr	r2, [r3, #12]
+	cmp	r2, #1			// check if the tile is a special road tile
+	ldreq	r2, =lane_tile
+	ldrne	r2, =road_tile
+	bl	drawTile
+	
+	add	ROW, #1			// continue down until reach the end
+	cmp	R0W, #22
+	blt	drawNewMapLoop
+	
 	pop	{r4-r10, lr}
 	bx	lr
 
-.globl	drawMap
+
 	ROW .req r4
 	COL .req r5
 	ADRS .req r6
@@ -307,14 +357,14 @@ drawPlayer:
 	push	{r4-r10, lr}
 	ldr	PLAYERADRS, =spawnArray		// loading base address
 	
-	ldr	r0, [PLAYERADRS]
-	ldr	r1, [PLAYERADRS, #4]
+	ldr	r0, [PLAYERADRS]		// col
+	ldr	r1, [PLAYERADRS, #4]		// row
 	bl	getTileRef
 	mov	TILEADRS, r0
 	
-	ldr	r0, [TILEADRS, #4]
-	ldr	r1, [TILEADRS, #8]
-	ldr	r2, =player
+	ldr	r0, [TILEADRS, #4]		// x
+	ldr	r1, [TILEADRS, #8]		// y
+	ldr	r2, =player_img
 	bl	drawTile
 	
 	pop	{r4-r10, lr}
