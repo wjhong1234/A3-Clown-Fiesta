@@ -415,6 +415,23 @@ drawLose:
 	
 	pop	{r4, lr}
 	bx	lr
+	
+.globl drawWin
+/*
+Draws the win screen.
+*/
+drawWin:
+	push	{r4, lr}	
+	
+	mov	r0, #0		// initial x
+	mov	r1, #0		// initial y
+	ldr	r2, =1023	// final x
+	ldr	r3, =767	// final y
+	ldr	r4, =win_pic
+	bl	CreateImage
+	
+	pop	{r4, lr}
+	bx	lr
 
 .globl	clearScreen
 /*
