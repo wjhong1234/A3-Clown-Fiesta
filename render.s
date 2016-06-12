@@ -218,6 +218,7 @@ drawNewMapLoop:
 	bl	getTileRef
 	ldr	r1, [r0, #16]
 	cmp	r1, #1			// if the tile has changed, then redraw it
+	bne	drawNewMapInc
 	mov	r1, #0
 	str	r1, [r0, #16]		// remove flag for change
 	
@@ -229,7 +230,7 @@ drawNewMapLoop:
 	ldreq	r2, =lane_tile
 	ldrne	r2, =road_tile
 	bl	drawTile
-	
+drawNewMapInc	
 	add	ROW, #1			// continue down until reach the end
 	cmp	ROW, #22
 	blt	drawNewMapLoop
