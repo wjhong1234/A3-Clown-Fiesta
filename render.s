@@ -177,6 +177,7 @@ render:
 	beq	renderNormal
 	blne	drawWin		
 	blmi	drawLose
+	bl	promptPrint
 	b	renderEnd
 	/*
 	ne - one	(2 - 1) win
