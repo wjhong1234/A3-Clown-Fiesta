@@ -6,6 +6,7 @@
 	.equ	UP, 0b111101111111	// Up button
 	.equ	DOWN, 0b111110111111	// Down button
 	.equ	A, 0b111111110111	// A button
+	.equ	NONE, 0b111111111111	// None have been pressed
 
 	// Flags	
 	.equ	TRUE, 1
@@ -16,6 +17,11 @@ menu:
 	BUTTON .req r6		// contains the button pressed
 	FLAG .req r5		// if flag is set, then start game. Else, quit game
 	push	{r4-r10, lr}
+
+	ldr	r0, =status
+	ldr	r1, [status]
+	cmp	r1, #0		// check if the player has won or lost
+	blne	keepPrompting	// if they have, the main menu won't print until they press something
 
 	mov	FLAG, #1	// initialize main menu so that 
 				// user is selecting start
@@ -63,3 +69,15 @@ menuexit:
 
 	.unreq	BUTTON
 	.unreq	FLAG
+	
+keepPrompting:
+	push	{r4-r10, lr}
+	ldr	r1, =NONE
+	
+promptLoop:
+	bl	getInput
+	cmp	r0, r1
+	beq	promptLoop
+	
+	pop	{r4-r10, lr}
+	bx	lr
