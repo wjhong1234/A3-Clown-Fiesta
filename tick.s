@@ -25,23 +25,23 @@
 	.equ	END, 22 * 10
 
 
-.globl	game
+.globl	tick
 	PLAY 		.req r7
 	RESTART_FLAG	.req r8
 	BUTTON 		.req r6
 /*
-game
+tick
 
 Contains the skeleton loop.
 Returns: Win (2) or Loss (0)
 */
-game:
+tick:
 	push	{r4-r10, lr}
 	ldr	r0, =gameState		// check if the player was already playing the game
 	ldr	r1, [r0]
 	cmp	r1, #1
 	beq	game			// if so, then go immediately into game
-					// if not, then assume new game
+					// if not, then check if they won or lost in previous loop
 gameStart:
 	ldr	r0, =play		// starts the game off
 	mov	r1, #0
@@ -51,7 +51,7 @@ gameStart:
 	cmp	RESTART_FLAG, #1	// check if the player has decided to restart the game
 	beq	gameEnd			// if so, simply draw the map if necessary
 
-game:
+gameLoop:
 	bl	getInput		// get input of player
 	bl	readInput		// read the input
 	
@@ -82,7 +82,7 @@ gameMove:
 	blne	movePlayer		// then update the position of player
 
 	bl	updateRoad		// update map based on the input
-//	bl	updateSpawn
+	bl	updateSpawn
 	bl	updateState		// update the state based on the map
 
 	ldr	r0, =status		// checks if the player has won or lost
@@ -163,10 +163,11 @@ checkButtons:
 	.unreq ACTION
 	.unreq PLAY
 
-updateMap:
+updateSpawn:
 	push	{r4-r10, lr}
 	
-	bl	updateRoad
+	bl	spawn
+	bl	moveSpawn
 
 	pop	{r4-r10, lr}
 	bx	lr
@@ -238,7 +239,8 @@ updateVar:
 	str	r1, [r0]
 	
 	cmp	HIT_FLAG, #1		// Reset player position if there was a collision
-	bleq	resetPlayerPosition	
+	bleq	resetPlayerPosition
+	bleq	obliterate		// Also removes the offending spawn
 	
 	// here we check if the lose or win flags have been triggered
 updateGameState:
