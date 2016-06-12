@@ -15,39 +15,58 @@ Instance of game environment
 .section .text
 	// adjust the latter number as necessary
 	.equ	END, 22 * 8	// end of the map	
+
+
 /*
-
-// Redraws center lane tile thing.
-
-
-	ADRS .req r6
-	ROW .req r5
-	COL .req r4
+redraws the center tiles.
+*/
+	COL	.req	r1
+	ROW	.req	r2
+	CHECK	.req	r3
+	NEED	.req	r4
 updateRoad:
 	push	{r4-r10, lr}
+	ldr	r0, =laneNum
+	ldr	NEED, [r0]		// updates what we check
+	add	NEED, #1
+	str	NEED, [r0]
 	
-	ldr	ADRS, =laneArray// retrieve lane array
-	mov	COL, #CENTER	// retrieve center tile
-	mov	ROW, #0		// retrieve top
-roadLoop:
-	ldr	r0, [ADRS]	
-	mov	r0, COL
+	mov	COL, #12		// begins loop
+	mov	ROW, #0
+
+updateRoadLoop:
+	mov	CHECK, ROW		
+checkWhite:
+	cmp	CHECK, #2		// row mod 3		
+	subgt	CHECK, #3
+	bgt	checkWhite		// keep going until row <= 0
+
+	cmp	CHECK, NEED		// check for desired
+	bne	checkWhiteEnd		// if not what we want, then go to the end of checkWhite
+	
+	mov	r2, #1
+	mov	r3, #0
+	
+	mov	r0, COL			// first get tile reference of previous tile
+	sub	r1, ROW, #1			
+	bl	getTileRef
+	str	r2, [r0, #16]		// flag that the tile has been changed
+	str	r3, [r0, #12]		// white -> gray
+	
+	mov	r0, COL			// get tile reference of current tile			
 	mov	r1, ROW
-	bl	drawTile	
-
-	ldr	r2,  =road
-	mov	r0, COL		//
-	mov	r1, ROW 	// 
-	bl	getTileCoord	// retrieve coordinate
-	ldr	r2, =LANE
-	mov	r0, 
-	bl	drawTile
-
+	bl	getTileRef
+	str	r2, [r0, #16]		// flag that this tile has been changed
+	mov	r2, [r0, #12]		// gray -> white
+	
+checkWhiteEnd:
+	add	ROW, #1
+	cmp	ROW, #22	
+	blt	updateRoadLoop
+	
 	pop	{r4-r10, lr}
 	bx	lr
-	.unreq	ROW
-	.unreq	COL
-*/
+	
 
 .globl	getTileRef
 /*
@@ -90,13 +109,14 @@ getTileRef:
 	.unreq	OFFSET
 
 .globl	getOverlap
+/*
+getOverlap
+Retrieves reference of possible overlapping item.
+Returns 0 if none available.
 
-//getOverlap
-//Retrieves reference of possible overlapping item.
-//Returns 0 if none available.
-
-//Returns:
-//r0 - reference of item
+Returns:
+r0 - reference of item
+*/
 	COUNT .req r1
 	S_ADRS .req r2
 	BASE_ADRS .req r3
@@ -128,7 +148,6 @@ overlapLoop:
 	mov	r0, #0			// return 0 if no overlap
 
 overlapEnd:
-	
 	pop	{r4-r10, lr}
 	bx	lr
 
@@ -192,7 +211,6 @@ gameMap:
 	*/
 	.end
 
-.globl	laneArray
-laneArray:
-	.skip 22 * 4	// contains reference of lane or road
-	.end
+.globl	laneNum
+laneNum:
+	.int 	0	// how we update the center of the map
