@@ -34,7 +34,8 @@ initGame:
 	
 	bl	initMap			// initializes the map
 	bl	resetPlayer		// resets the player
-	bl	initState
+	bl	initState		// initializes the state
+	bl	initDraw
 	pop	{r4-r10, lr}
 	bx	lr
 

@@ -19,7 +19,7 @@ menu:
 	push	{r4-r10, lr}
 
 	ldr	r0, =status
-	ldr	r1, [status]
+	ldr	r1, [r0]
 	cmp	r1, #0		// check if the player has won or lost
 	blne	keepPrompting	// if they have, the main menu won't print until they press something
 

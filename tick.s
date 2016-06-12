@@ -12,8 +12,8 @@
 	.equ	LOSE, 1
 
 	// Flags if player has pressed A or not
-	.equ	ON, #1
-	.equ	OFF, #0
+	.equ	ON, 1
+	.equ	OFF, 0
 
 	// Flags for player action
 	.equ	EXIT, 0
@@ -40,7 +40,7 @@ tick:
 	ldr	r0, =gameState		// check if the player was already playing the game
 	ldr	r1, [r0]
 	cmp	r1, #1
-	beq	game			// if so, then go immediately into game
+	beq	gameLoop		// if so, then go immediately into game
 					// if not, then check if they won or lost in previous loop
 gameStart:
 	ldr	r0, =play		// starts the game off
@@ -205,7 +205,7 @@ updateState:
 	cmp	r0, #0
 	beq	updateVar		// If there is no overlap, skip to updating variables
 	ldrne	r1, [r0, #8]		// If there is an overlap, then load the offending obstacle type
-	cmp	r1, #FUEL_TYPE		// Check if the item is fuel or otherwise
+	cmp	r1, #HAIR_TYPE		// Check if the item is fuel or otherwise
 	moveq	FUEL_FLAG, #1
 	movne	HIT_FLAG, #1	
 
@@ -278,7 +278,7 @@ faceState:
 	.int	0			// 0 - normal
 					// 1 - collision
 					// 2 - fuel
-
+.globl	play
 // Checks if the player has pressed A					
 play:
 	.int	0			

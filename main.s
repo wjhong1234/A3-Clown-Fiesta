@@ -50,7 +50,7 @@ _start:
 	DIFFERENCE	.req	r7			//difference in time between current time and last frame time
 	TIMEPERFRAME	.req	r8			//time per frame
 	RUNNINGFLAG	.req	r9			//flag to see if game running
-
+	GAMEFLAG	.req	r10			//flag to see if player going to start or quit at menu
 main:
     	mov	sp, #0x8000				// Initializing the stack pointer
 	bl	EnableJTAG
@@ -85,7 +85,7 @@ loop:	ldr	CURRENTTIME, [CLOCK]			//get current system clock time
 	ldr	BASEADDRESS, =gameState			//current state of the game (running / not running)
 	ldr	RUNNINGFLAG, [BASEADDRESS]		//load current state
 	
-	cmp	RUNNING, #END				//compare to see if game stopped
+	cmp	RUNNINGFLAG, #END			//compare to see if game stopped
 	beq	startGame				//return to main menu
 
 	mov	LASTFRAME, CURRENTTIME			//move current time into last frame time
