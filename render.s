@@ -313,7 +313,7 @@ drawBanner:
 	bleq	CreateImage
 	pop	{r4, lr}
 	bx	lr
-
+	
 	SPAWNADRS	.req r4
 	COUNT		.req r5
 	OFFSET		.req r6
@@ -331,9 +331,21 @@ drawSpawnLoop:
 	
 	ldr	r0, [SPAWNADRS]
 	ldr	r1, [SPAWNADRS, #4]
+	sub	r1, #1
+	bl	getTileRef
+	mov	r3, r0
+	ldr	r0, [r3, #12]
+	cmp	r0, #1
+	ldreq	r2, =lane_tile
+	ldrne	r2, =road_tile
+	ldr	r0, [r3, #4]
+	ldr	r1, [r3, #8]
+	bl	drawTile
+	
+	ldr	r0, [SPAWNADRS]
+	ldr	r1, [SPAWNADRS, #4]
 	bl	getTileRef
 	mov	TILEADRS, r0
-	
 	ldr	r0, [SPAWNADRS, #8]
 	cmp	r0, #1				// check if the item is bernie or toupee
 	ldreq	r2, =bernie
