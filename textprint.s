@@ -226,7 +226,8 @@ textLoop:
 .section .data
 
 .align 4
-
+.globl font
+font:		.incbin	"font.bin"
 .globl fuel
 fuel: .ascii "FUEL:"	// 5
 .globl life
