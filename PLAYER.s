@@ -39,8 +39,8 @@ PLAYER CONTAINS THE ATTRIBUTES OF A PLAYER: [0]XPOSITION [1]YPOSITION [2]FUEL [3
 .equ	LEFT, 0				//flag value for left movement
 .equ	RIGHT, 1			//flag value for right movement
 .equ	MOVE, 1				//tile distance for a single move block
-.equ	DEFAULT_X, 13			//default xposition
-.equ	DEFAULT_Y, 22			//default yposition
+.equ	DEFAULT_X, 12			//default xposition
+.equ	DEFAULT_Y, 21			//default yposition
 .equ	DEFAULT_FUEL, 100		//default fuel amount
 .equ	DEFAULT_LIVES, 3		//default lives
 
@@ -50,6 +50,9 @@ movePlayer:
 	DIRECTION	.req	r0		//direction to move player
 	BASEADDRESS	.req	r3		//base address of player attributes
 	XPOSITION	.req	r4		//xposition of player
+
+	ldr	BASEADDRESS, =oneDirection	//load player attributes address
+	str	DIRECTION, [BASEADDRESS]	//store the direction
 
 	ldr	BASEADDRESS, =player		//load player attributes address
 	ldr	XPOSITION, [BASEADDRESS]	//load player xposition
@@ -115,8 +118,12 @@ resetPlayerPosition:
 	bx	lr
 
 .section .data
+.align
 .globl	player
-player:	.int	13		//x position of player
-	.int	22		//y position of player
+player:	.int	12		//x position of player
+	.int	21		//y position of player
 	.int	100		//player fuel
 	.int	3		//player lives
+.globl	oneDirection
+oneDirection:
+	.int	2		//which direction player moved

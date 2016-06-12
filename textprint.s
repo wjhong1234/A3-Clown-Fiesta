@@ -103,7 +103,7 @@ writeLife:
 	push	{r4-r10, lr}
 
 	ldr	r0, =player
-	ldr	r1, [r0, #16]// retrieve life
+	ldr	r1, [r0, #12]// retrieve life
 
 	add	LIFE, r1, #48
 
@@ -132,7 +132,7 @@ writeFuel:
 	push	{r4-r10, lr}
 	
 	ldr	r0, =player
-	ldr	NUM, [r0, #12]// retrieve fuel
+	ldr	NUM, [r0, #8]// retrieve fuel
 
 	mov	HUND, #48	// initialize hundred's place to decimal number of '0'
 	mov	TEN, #48	// initialize ten's place to decimal number of '0'

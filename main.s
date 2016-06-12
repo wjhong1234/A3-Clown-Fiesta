@@ -60,8 +60,8 @@ startGame:
 	bl	menu					//main menu function
 	mov	GAMEFLAG, r0
 	bl	clearScreen				//clear screen to start game or end
-	cmp	GAMEFLAG, #START			//compare gameflag to start
 
+	cmp	GAMEFLAG, #START			//compare gameflag to start
 	bne	mainEnd
     
 mainLoop:
@@ -101,9 +101,7 @@ mainEnd:
 	.unreq	DELTA
 	.unreq	DIFFERENCE
 	.unreq	TIMEPERFRAME
-	.unreq	RUNNINGFLAG
-	
-	bl	clearScreen				//clear screen to end game
+	.unreq	RUNNINGFLAG	
    
 haltLoop$:
 	b		haltLoop$

@@ -42,10 +42,17 @@ tick:
 	cmp	r1, #1
 	beq	gameLoop		// if so, then go immediately into game
 					// if not, then check if they won or lost in previous loop
+
+	mov	RESTART_FLAG, #0	// initialize the restart flag
 gameStart:
 	ldr	r0, =play		// starts the game off
 	mov	r1, #0
 	str	r1, [r0]		// set it so game has not started
+
+	ldr	r0, =gameState		// set it so that the player is playing
+	mov	r1, #1
+	str	r1, [r0]
+
 	bl	initGame		// resets all aspects of game
 	
 	cmp	RESTART_FLAG, #1	// check if the player has decided to restart the game
@@ -72,6 +79,7 @@ gameLoop:
 	bne	gameEnd			// if not, then don't update anything
 
 gameMove:
+/*	// testing removal of this code
 	mov	r1, #2
 	cmp	r0, #MOVE_LEFT		// check if moved left
 	moveq	r1, #0		
@@ -93,7 +101,7 @@ gameMove:
 	ldr	r2, =gameState		// if the player has won or lost, then end the game
 	mov	r0, #0
 	str	r0, [r2]
-	
+*/	
 gameEnd:
 	pop	{r4-r10, lr}
 	bx	lr
@@ -102,11 +110,9 @@ gameEnd:
 readInput
 Reads the input and deciphers what will be done
 r0 - buttons
-r1 - if started the game
 
 Returns:
 r0 - what button has been pressed in order of importance
-r1 - if A has been pressed
 */
 	ACTION		.req	r6
 	PLAY_ADRS	.req	r4
@@ -270,7 +276,7 @@ status:
 .globl	gameState
 // Checks if the player has chosen to quit
 gameState:
-	.int	1	
+	.int	0
 	
 .globl	faceState
 // tracks which face Trump will make
@@ -281,4 +287,5 @@ faceState:
 .globl	play
 // Checks if the player has pressed A					
 play:
-	.int	0			
+	.int	0		
+	.end	

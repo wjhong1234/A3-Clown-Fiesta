@@ -17,6 +17,7 @@ Instance of game environment
 	.equ	END, 22 * 8	// end of the map	
 
 
+.globl	updateRoad
 /*
 redraws the center tiles.
 */
@@ -57,7 +58,7 @@ checkWhite:
 	mov	r1, ROW
 	bl	getTileRef
 	str	r2, [r0, #16]		// flag that this tile has been changed
-	mov	r2, [r0, #12]		// gray -> white
+	str	r2, [r0, #12]		// gray -> white
 	
 checkWhiteEnd:
 	add	ROW, #1
@@ -66,6 +67,11 @@ checkWhiteEnd:
 	
 	pop	{r4-r10, lr}
 	bx	lr
+
+	.unreq	COL
+	.unreq	ROW
+	.unreq	CHECK
+	.unreq	NEED
 
 .globl	getTileRef
 /*
@@ -124,31 +130,37 @@ r0 - reference of item
 getOverlap:
 	push	{r4-r10, lr}
 
-	ldr	r2, =player				// retrieve player reference
-	ldr	P_COL, [r2]				// load column of player
-	ldr	P_ROW, [r2, #4]				// load row of player
-	ldr	BASE_ADRS, =spawnArray			// 
-	mov	COUNT, #0				// the counter along the array
+	ldr	r2, =player		// retrieve player reference
+	ldr	P_COL, [r2]		// load column of player
+	ldr	P_ROW, [r2, #4]		// load row of player
+	ldr	BASE_ADRS, =spawnArray	// 
+	mov	COUNT, #0		// the counter along the array
 overlapLoop:
 	add	S_ADRS, COUNT, COUNT, lsl #1		// counter * 3
 	add	S_ADRS, BASE_ADRS, S_ADRS, lsl #2	// adrs = base + offset (count * 3 * 4)
 	ldr	r6, [S_ADRS, #4]			// retrieve row
-	cmp	r6, P_ROW				// compare spawn's row and player's row
-	ldreq	r6, [S_ADRS]				// if the same, retrieve the column
-	cmpeq	r6, P_COL				// and compare spawn's and player's column.
-	moveq	r0, S_ADRS				// if the same, return the address of the spawn
-	beq	overlapEnd				// and branch to end of function
+	cmp	r6, P_ROW			// compare spawn's row and player's row
+	ldreq	r6, [S_ADRS]		// if the same, retrieve the column
+	cmpeq	r6, P_COL			// and compare spawn's and player's column.
+	moveq	r0, S_ADRS		// if the same, return the address of the spawn
+	beq	overlapEnd		// and branch to end of function
 
-	add	COUNT, #1				// if not the same, increment counter
-	ldr	r6, =itemCount				// retrieve item count
+	add	COUNT, #1		// if not the same, increment counter
+	ldr	r6, =itemCount		// retrieve item count
 	ldr	r0, [r6]
-	cmp	COUNT, r0				// compare the count and the item count
-	blt	overlapLoop				// if counter < item count, keep looping 
-	mov	r0, #0					// return 0 if no overlap
+	cmp	COUNT, r0		// compare the count and the item count
+	blt	overlapLoop		// if counter < item count, keep looping 
+	mov	r0, #0			// return 0 if no overlap
 
 overlapEnd:
 	pop	{r4-r10, lr}
 	bx	lr
+
+	.unreq COUNT
+	.unreq S_ADRS
+	.unreq BASE_ADRS
+	.unreq P_ROW
+	.unreq P_COL
 
 .globl	hasCollide
 /*
@@ -193,10 +205,14 @@ isEnd:
 
 .section .data
 	// total 22 * 25 tiles
-
+.align
 .globl	tilePassed
 tilePassed:
-	.int 0
+	.int 	0
+
+.globl	laneNum
+laneNum:
+	.int	0	// keeps track of how to update the map
 
 .globl gameMap
 gameMap:
@@ -210,6 +226,3 @@ gameMap:
 	*/
 	.end
 
-.globl	laneNum
-laneNum:
-	.int 	0	// how we update the center of the map

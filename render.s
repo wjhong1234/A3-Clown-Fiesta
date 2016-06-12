@@ -71,7 +71,7 @@ DrawPixel:
 
 	pop		{r4}
 	bx		lr
-
+	.unreq	offset
 /* Draw a character to (x,y)
 character: r0
 colour: r1
@@ -158,11 +158,13 @@ drawTile:
 .globl	initDraw
 initDraw:
 	push	{r4-r10, lr}
-	bl	drawBanner
 	bl	drawMap
+	bl	drawBanner
+	bl	drawPlayer
 	bl	initPrint
 	bl	writeFuel
 	bl	writeLife
+	//bl	pressAPrint
 	pop	{r4-r10, lr}
 	bx	lr
 
@@ -174,8 +176,8 @@ render:
 	ldr	r0, =status	// check if the player has lost or won
 	ldr	r1, [r0]
 	subs	r1, #1	
-	beq	renderNormal
-	blne	drawWin		
+	beq	renderNormal	// If the player hasn't won or lost, render normally
+	blne	drawWin		// otherwise draw the win or lose menu
 	blmi	drawLose
 	bl	promptPrint
 	b	renderEnd
@@ -203,7 +205,7 @@ renderEnd:
 	
 	COL	.req	r4
 	ROW	.req	r5
-	.equ	CENTER, #12
+	.equ	CENTER, 12
 drawNewMap:
 	push	{r4-r10, lr}
 	
@@ -229,11 +231,13 @@ drawNewMapLoop:
 	bl	drawTile
 	
 	add	ROW, #1			// continue down until reach the end
-	cmp	R0W, #22
+	cmp	ROW, #22
 	blt	drawNewMapLoop
 	
 	pop	{r4-r10, lr}
 	bx	lr
+	.unreq	COL
+	.unreq	ROW
 
 
 	ROW .req r4
@@ -275,8 +279,10 @@ drawCont:
 	
 	pop	{r4-r10, lr}
 	bx	lr
+	.unreq	ROW
+	.unreq	COL
+	.unreq	ADRS
 
-.globl	drawFace
 /*
 drawFace
 Draws Trump's faces.
@@ -305,14 +311,14 @@ drawFace:
 Draws the banner on the left side of the game screen.
 */
 drawBanner:
-	push	{r4, lr}	
+	push	{r4-r10, lr}	
 	mov	r0, #7		// initial x
 	mov	r1, #64		// initial y
 	ldr	r2, =223	// final x
 	ldr	r3, =767	// final y
 	ldr	r4, =banner
-	bleq	CreateImage
-	pop	{r4, lr}
+	bl	CreateImage
+	pop	{r4-r10, lr}
 	bx	lr
 	
 	SPAWNADRS	.req r4
@@ -324,7 +330,6 @@ drawSpawn:
 	mov	COUNT, #0			// counter
 	ldr	r8, =spawnArray			// loading base address
 drawSpawnLoop:
-	// x * 3 + whatever you want
 	lsl	OFFSET, COUNT, #2		// X * 4
 	sub	OFFSET, COUNT			// X * (4 - 1) = X * 3
 	
@@ -363,13 +368,52 @@ drawSpawnLoop:
 	
 	pop	{r4-r10, lr}
 	bx	lr
+	.unreq	SPAWNADRS
+	.unreq	COUNT
+	.unreq	OFFSET
+	.unreq	TILEADRS
 
+	DIFFERENCE	.req r6
 	PLAYERADRS	.req r4
 	TILEADRS	.req r5
+	.equ	RIGHT, 19
+	.equ	LEFT, 4
 drawPlayer:
 	push	{r4-r10, lr}
-	ldr	PLAYERADRS, =spawnArray		// loading base address
+	ldr	PLAYERADRS, =player		// loading base address
 	
+	ldr	r1, =oneDirection		// check which direction player moved
+	ldr	r0, [r1]			// retrieve the value of direction
+	
+	cmp	r0, #2
+	beq	drawPlayerCont			// if doesn't move, then skip erasing
+	
+						// handles erasing the previous drawn item
+	cmp	r0, #0				// if moved left, erase right
+	moveq	DIFFERENCE, #1			// store difference in r0
+	cmp	r0, #1				// if moved right, erase left
+	moveq	DIFFERENCE, #-1			// store difference in r0
+
+	ldr	r1, [PLAYERADRS]		// get column
+	add	r0, DIFFERENCE			// get the desired column (difference + column)
+	ldr	r1, [PLAYERADRS, #4]		// get row
+	bl	getTileRef			// retrieve the tile reference
+	ldr	r1, [r0]			// retrieve tile type
+	cmp	r1, #0				// check if the tile is side or road
+	ldrne	r2, =grass_tile			// if side, then draw a grass tile
+	bne	eraseOld			
+	ldr	r2, [r0, #12]			// if road, then check if this tile is special
+	cmp	r2, #0				
+	ldreq	r2, =road_tile			// if not special, draw a road tile
+	ldrne	r2, =lane_tile			// if special, then draw a lane tile
+
+eraseOld:
+	mov	r7, r0				// move tile reference
+	ldr	r0, [r7, #4]			// retrieve x coordinate
+	ldr	r1, [r7, #8]			// retrieve y coordinate
+	bl	drawTile
+
+drawPlayerCont:
 	ldr	r0, [PLAYERADRS]		// col
 	ldr	r1, [PLAYERADRS, #4]		// row
 	bl	getTileRef
@@ -382,6 +426,8 @@ drawPlayer:
 	
 	pop	{r4-r10, lr}
 	bx	lr
+	.unreq	PLAYERADRS
+	.unreq	TILEADRS
 
 .globl drawFlags
 /*
@@ -478,13 +524,4 @@ clearLoop:
 
 .align 4
 font:		.incbin	"font.bin"
-
-// data structure of image
-image:
-	.int 0	// color/address of image
-	.int 0	// initial x
-	.int 0	// final x
-	.int 0	// initial y
-	.int 0	// final y
-
 
