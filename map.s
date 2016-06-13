@@ -8,8 +8,6 @@ Instance of game environment
 
 */
 	.equ	CENTER, 12
-	.equ 	LEFTMOST, 224
-	.equ 	UPPERMOST, 64
 	.equ	ROAD, 0
 	.equ	SIDE, 1
 .section .text
@@ -20,16 +18,20 @@ Instance of game environment
 /*
 redraws the center tiles.
 */
-	COL	.req	r1
-	ROW	.req	r2
-	CHECK	.req	r3
 	NEED	.req	r4
+	COL	.req	r5
+	ROW	.req	r6
+	CHECK	.req	r7
+	ZERO	.req	r8
+	ONE	.req	r9
 updateRoad:
 	push	{r4-r10, lr}
-	ldr	r0, =laneNum
-	ldr	NEED, [r0]		// updates what we check
-	add	NEED, #1
-	str	NEED, [r0]
+	ldr	r0, =laneNum		// Retrieve address of the modulo
+	ldr	NEED, [r0]		// Load the value of what we want
+	add	NEED, #1		// Increment the value of what we want
+	cmp	NEED, #3		// Check if it's reached the max
+	moveq	NEED, #0		// If it has reached the max, set it back to 0
+	str	NEED, [r0]		// Store the new value
 	
 	mov	COL, #12		// begins loop
 	mov	ROW, #0
@@ -44,20 +46,20 @@ checkWhite:
 	cmp	CHECK, NEED		// check for desired
 	bne	checkWhiteEnd		// if not what we want, then go to the end of checkWhite
 	
-	mov	r2, #1
-	mov	r3, #0
+	mov	ONE, #1
+	mov	ZERO, #0
 	
 	mov	r0, COL			// first get tile reference of previous tile
 	sub	r1, ROW, #1			
 	bl	getTileRef
-	str	r2, [r0, #16]		// flag that the tile has been changed
-	str	r3, [r0, #12]		// white -> gray
+	str	ONE, [r0, #16]		// flag that the tile has been changed
+	str	ZERO, [r0, #12]		// white -> gray
 	
 	mov	r0, COL			// get tile reference of current tile			
 	mov	r1, ROW
 	bl	getTileRef
-	str	r2, [r0, #16]		// flag that this tile has been changed
-	str	r2, [r0, #12]		// gray -> white
+	str	ONE, [r0, #16]		// flag that this tile has been changed
+	str	ONE, [r0, #12]		// gray -> white
 	
 checkWhiteEnd:
 	add	ROW, #1
