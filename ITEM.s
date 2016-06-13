@@ -6,9 +6,10 @@ brand new version of item.s
 
 .globl	spawn
 
+.equ	MOVE, 1
 .equ	MAX_POS, 14
 .equ	MAX_ITEMS, 7
-.equ	MAX_OFFSET, 5
+.equ	MAP_OFFSET, 5
 .equ	TYPE, 1
 .equ	INITIAL_Y, 2
 
@@ -21,6 +22,7 @@ spawn:
 	SPAWNARRAY	.req	r7
 	SPARE		.req	r8
 	ITEMTYPE	.req	r9
+	OFFSET		.req	r10
 
 	push	{r4-r10, lr}
 
