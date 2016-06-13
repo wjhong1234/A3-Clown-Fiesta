@@ -554,3 +554,5 @@ clearLoop:
 
 .section .data
 font:	.incbin "font.bin"
+faceTimer:
+	.int	0
