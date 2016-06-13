@@ -43,11 +43,11 @@ _start:
 .equ	END, 0						//game end flag
 
 	BASEADDRESS	.req	r2			//base address
-	CLOCK		.req	r3			//clock address
+	DIFFERENCE	.req	r3			//difference in time between current time and last frame time
 	CURRENTTIME	.req	r4			//time right now
 	LASTFRAME	.req	r5			//time of the last frame
 	DELTA		.req	r6			//total change in time 
-	DIFFERENCE	.req	r7			//difference in time between current time and last frame time
+	CLOCK		.req	r7			//clock address
 	TIMEPERFRAME	.req	r8			//time per frame
 	RUNNINGFLAG	.req	r9			//flag to see if game running
 	GAMEFLAG	.req	r10			//flag to see if player going to start or quit at menu
