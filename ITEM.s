@@ -145,7 +145,7 @@ cont:	ldr	BASEADDRESS, =lastTile		//load last tile address
 	.unreq	ITEMTYPE
 	.unreq	OFFSET
 
-endSpn:	pop	{r4-r10}
+endSpn:	pop	{r4-r10, lr}
 	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
@@ -185,7 +185,7 @@ fin:	bl	enforceFence			//remove items now off the map
 	.unreq	ITEMCOUNT
 	.unreq	COUNTER
 
-	pop	{r4-r10}
+	pop	{r4-r10, lr}
 	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
@@ -257,7 +257,7 @@ gated:	.unreq	BASEADDRESS
 	.unreq	OFFSET
 	.unreq	SPARE
 
-	pop	{r4-r10}
+	pop	{r4-r10, lr}
 	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
@@ -346,7 +346,7 @@ endZ:	.unreq	ITEMX
 	.unreq	ITEMTYPE
 	.unreq	SPARE
 
-	pop	{r4-r10}
+	pop	{r4-r10, lr}
 	bx	lr
 
 .section .data
