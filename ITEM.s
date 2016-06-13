@@ -6,7 +6,7 @@ brand new version of item.s
 
 .globl	spawn
 
-.equ	MAX_POS, 15
+.equ	MAX_POS, 14
 .equ	MAX_ITEMS, 7
 .equ	MAX_OFFSET, 5
 .equ	TYPE, 1
@@ -72,7 +72,7 @@ endSpn:	.unreq	OUTPUT
 
 //---------------------------------------------------------------------------------------------------//
 
-.equ	LAST_ROW, 24
+.equ	LAST_ROW, 25
 
 rebirth:
 	push	{r4-r10, lr}
@@ -109,7 +109,7 @@ rep:	cmp	COUNTER, #7
 	add	ITEMX, #MAP_OFFSET		//add the mask offset
 	
 	bl	xorShift			//generate a random number
-	and	ITEMTYPE, OUTPUT, #TYPE		//mask the generate number to an item type
+	and	ITEMTYPE, OUTPUT, #TYPE		//mask the generated number to an item type
 
 	mov	SPARE, #INITIAL_Y		//move default y into spare
 
