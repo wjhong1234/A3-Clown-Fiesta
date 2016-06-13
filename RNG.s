@@ -57,7 +57,7 @@ xorShift:
 	.unreq	BASEADDRESS
 	.unreq	LIMIT
 
-	pop	{r4-r10}
+	pop	{r4-r10,lr}
 	bx	lr
 
 .section .data

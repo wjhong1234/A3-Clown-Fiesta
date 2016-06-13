@@ -17,18 +17,18 @@ getInput:
 pressLoop:	
 	bl	Read_SNES		// Begin reading controller input
 
-	mov	r5, r0			// Store 'buttons' array
-	bl	Check_Buttons		// Check for flags
-	mov	r8, r1			// sets flag for whether any buttons have been pressed
+//	mov	r5, r0			// Store 'buttons' array
+//	bl	Check_Buttons		// Check for flags
+//	mov	r8, r1			// sets flag for whether any buttons have been pressed
 //	cmp	SAVED_BUTTONS, r5	// checks whether buttons have changed
 //	beq	pressLoop		// if not, keep looping
 	
-	cmp	r8, #0			// checks whether anything has been pressed
+//	cmp	r8, #0			// checks whether anything has been pressed
 //	moveq	SAVED_BUTTONS, r5	// if not, preserves unpressed state
-	beq	pressLoop		// it also keeps looping
+//	beq	pressLoop		// it also keeps looping
 
-	lsr	r5, #5			// shift the unneeded four bits out (13-16)
-	mov	r0, r5			// returns buttons pressed to main
+	lsr	r0, #5			// shift the unneeded four bits out (13-16)
+//	lsl #5			// returns buttons pressed to main
 	pop	{r4-r10, lr}
 	bx 	lr
 

@@ -85,6 +85,8 @@ initState:
 	str	r3, [r0]
 	ldr	r0, =status	
 	str	r3, [r0]
+	ldr	r0, =play
+	str	r3, [r0]
 	ldr	r0, =gameState		
 	str	r3, [r0]
 	ldr	r0, =faceState
