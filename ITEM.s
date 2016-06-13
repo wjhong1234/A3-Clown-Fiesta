@@ -48,6 +48,7 @@ SPAWNARRAY CONTAINS 7 GROUPS OF THREE GROUPS OF PARAMETERS: [XPOS/YPOS/ITEMTYPE]
 .globl	spawn
 
 .equ	SPEED, 3		//default speed
+.equ	MAX_TILE_SKIP, 4	//maximum item spawn skip
 .equ	MAX_ITEMS, 7		//maximum item count
 .equ	MAX_POS, 15		//maximum item position
 .equ	TYPE, 1			//item type mask
@@ -71,6 +72,12 @@ spawn:
 	ITEMTYPE	.req	r9		//the type of the newly spawned item [fuel/obstacle]
 	OFFSET		.req	r10		//offset of array address
 
+	ldr	BASEADDRESS, =itemCount		//load item count address
+	ldr	ITEMCOUNT, [BASEADDRESS]	//load item count
+	
+	cmp	ITEMCOUNT, #MAX_ITEMS		//compare item count to maximum
+	bge	endSpn				//dont spawn if maximum met
+
 	ldr	BASEADDRESS, =tileReq		//load required tiles address
 	ldr	REQUIRED, [BASEADDRESS]		//load required tiles
 
@@ -78,7 +85,7 @@ spawn:
 	bgt	cont				//generate new number if tile count is zero
 
 	bl	xorShift			//generate a random number
-	and	OUTPUT, #MAX_ITEMS		//mask the returned number with #7
+	and	OUTPUT, #MAX_TILE_SKIP		//mask the returned number with #7
 	mov	REQUIRED, OUTPUT		//using output register as a spare register
 
 	cmp	REQUIRED, #0			//compare item requirement to #1
