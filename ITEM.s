@@ -6,7 +6,7 @@ brand new version of item.s
 
 .globl	spawn
 
-.equ	MAX_POS, 7
+.equ	MAX_POS, 15
 .equ	MAX_ITEMS, 7
 .equ	MAX_OFFSET, 5
 .equ	TYPE, 1
@@ -72,9 +72,7 @@ endSpn:	.unreq	OUTPUT
 
 //---------------------------------------------------------------------------------------------------//
 
-.globl	rebirth
-
-.equ	LAST_ROW, 21
+.equ	LAST_ROW, 24
 
 rebirth:
 	push	{r4-r10, lr}
@@ -164,7 +162,8 @@ movAll:	cmp	COUNTER, ITEMCOUNT		//compare item count to counter
 	add	COUNTER, #1			//increment counter
 	b	movAll
 
-fin:	bl	rebirth				//remove items now off the map and spawn new ones
+fin:	cmp	ITEMCOUNT, #7
+	blge	rebirth				//remove items now off the map and spawn new ones
 
 	.unreq	BASEADDRESS
 	.unreq	SPAWNARRAY
