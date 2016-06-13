@@ -175,3 +175,9 @@ fin:	bl	rebirth				//remove items now off the map and spawn new ones
 	pop	{r4-r10,lr}
 	bx	lr
 
+.section .data
+.globl	itemCount
+itemCount:	.int	0		//number of items currently spawned
+
+.globl	spawnArray
+spawnArray:	.skip	7 * 3 * 4	//seven item max * three parameters per item * four bytes
