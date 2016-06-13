@@ -52,7 +52,7 @@ SPAWNARRAY CONTAINS 7 GROUPS OF THREE GROUPS OF PARAMETERS: [XPOS/YPOS/ITEMTYPE]
 .equ	MAX_POS, 15		//maximum item position
 .equ	TYPE, 1			//item type mask
 .equ	MAP_OFFSET, 5		//offset for map
-.equ	INITIAL_Y, 0		//initial y position
+.equ	INITIAL_Y, 2		//initial y position
 .equ	BOTTOM_ROW, 24		//bottomost row number
 .equ	MOVE, 1			//move distance
 
@@ -353,12 +353,13 @@ endZ:	.unreq	ITEMX
 	bx	lr
 
 .section .data
+tileReq:	.int	0		// tiles to count
+
+lastTile:	.int	0		// tile since last spawn
+
 .globl	itemCount
 itemCount:	.int	0		//number of items currently spawned
 
 .globl	spawnArray
 spawnArray:	.skip	7 * 3 * 4	//seven item max * three parameters per item * four bytes
-
-tileReq:	.int	0		//tiles to count
-
-lastTile:	.int	0		//tile since last spawn
+		.end
