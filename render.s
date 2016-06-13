@@ -308,7 +308,7 @@ revertFace:				// before reverting face to the regular one, we wait a set amount
 	ldr	CYCLES, [ADRS]	
 	add	CYCLES, #1		// increment the amount of cycles
 	str	CYCLES, [ADRS]		// Store the new value of cycles
-	cmp	CYCLES, MAX_CYCLE	// Check if the amount of cycles passed equals the max amount of cycles wanted
+	cmp	CYCLES, #MAX_CYCLE	// Check if the amount of cycles passed equals the max amount of cycles wanted
 	blt	drawFaceEnd		// If it is less than the max, then don't redraw the face
 	movge	CYCLES, #0		// If they are equal, reset the timer
 	ldrge	r4, =face_n		// If they are equal, revert face to normal
