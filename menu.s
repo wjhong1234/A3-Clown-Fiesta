@@ -1,75 +1,62 @@
 .section .text
 .globl menu
-	.equ	SEL, 0b110111111111
-	.equ	START, 0b111011111111
-	.equ	UP, 0b111101111111
-	.equ	DOWN, 0b111110111111
-	.equ	LEFT, 0b111111011111
-	.equ	RIGHT, 0b111111101111
-	.equ	A, 0b111111110111
+
+	// The binary numbers that will be used
+	// to determine which buttons have been pressed
+	.equ	UP, 0b111101111111	// Up button
+	.equ	DOWN, 0b111110111111	// Down button
+	.equ	A, 0b111111110111	// A button
+	.equ	NONE, 0b111111111111	// None have been pressed
+
+	// Flags	
+	.equ	TRUE, 1
+	.equ	START, 1
+	.equ	QUIT, 0
+
 menu:
 	BUTTON .req r6		// contains the button pressed
 	FLAG .req r5		// if flag is set, then start game. Else, quit game
 	push	{r4-r10, lr}
 
-	mov	FLAG, #1	// initialize main menu so that user is selecting start
-	mov	r0, #0		// initial x
-	mov	r1, #0		// initial y
-	ldr	r2, =1023	// final x
-	ldr	r3, =767	// final y
-	ldr	r4, =menu_pic
-	bl	CreateImage
-menuloop:
-	bl	getInput
+	ldr	r0, =status
+	ldr	r1, [r0]
+	cmp	r1, #0		// check if the player has won or lost
+	blne	keepPrompting	// if they have, the main menu won't print until they press something
+
+	mov	FLAG, #1	// initialize main menu so that 
+				// user is selecting start
+	bl	drawMenu	
+
+menuLoop:
+	bl	getInput	// Retrieve input of user
 	mov	BUTTON, r0
 	
-	mov	r0, BUTTON	// arg 1: the user input
-	ldr	r1, =A		// arg 2: desired button
-	bl	checkButton	// check if user pressed A
-	cmp	r0, #1		
-	beq	menuexit
+	mov	r0, BUTTON	// before anything is checked,
+	ldr	r1, =A		// we check if A has been pressed
+	bl	checkButton	
+	cmp	r0, #TRUE	// if they did, branch to selection
+	beq	menuexit	
 
-	mov	r0, BUTTON	// arg 1: the user input
-	ldr	r1, =UP		// arg 2: desired button
-	bl	checkButton	// check if user pressed UP
-	cmp	r0, #1		// check if the button matches		
-	cmpeq	FLAG, #0	// checks if user is currently selecting 'quit game'
-	moveq	FLAG, #1	// if so, selection is moved to 'start game'
+	mov	r0, BUTTON	// check if user pressed UP
+	ldr	r1, =UP		
+	bl	checkButton	
+	cmp	r0, #TRUE
+				// this prevents players from pressing UP at "start"
+	cmpeq	FLAG, #QUIT	// First it checks if the flags are at "Quit"
+	moveq	FLAG, #START	// If the flags are at "Quit", they are moved to "Start"
 
-	ldr	r0, =327	// initial x
-	ldr	r1, =478	// initial y
-	ldr	r2, =367	// final x
-	ldr	r3, =627	// final y
-	ldreq	r4, =leftstart_pic
-	bleq	CreateImage
-	ldr	r0, =671	// initial x
-	ldr	r1, =480	// initial y
-	ldr	r2, =711	// final x
-	ldr	r3, =629	// final y
-	ldreq	r4, =rightstart_pic
-	bleq	CreateImage
+	mov	r0, BUTTON	// check if user pressed DOWN
+	ldr	r1, =DOWN	
+	bl	checkButton	
+	cmp	r0, #1	
+				// this prevents players from pressing DOWN at "quit"
+	cmpeq	FLAG, #START	// checks if user is currently selecting 'start game'
+	moveq	FLAG, #QUIT	// if so, selection is moved to 'quit game'
 
-	mov	r0, BUTTON	// arg 1: the user input
-	ldr	r1, =DOWN	// arg 2: desired button
-	bl	checkButton	// check if user pressed DOWN
-	cmp	r0, #1		// if the button matches
-	cmpeq	FLAG, #1	// checks if user is currenty selecting 'start game'
-	moveq	FLAG, #0	// if so, selection is moved to 'quit game'
+	mov	r0, FLAG	// the flags will be drawn
+	bl	drawFlags	// depending on where the choice markers are
 
-	ldr	r0, =327	// initial x
-	ldr	r1, =478	// initial y
-	ldr	r2, =367	// final x
-	ldr	r3, =627	// final y
-	ldreq	r4, =leftquit_pic
-	bleq	CreateImage
-	ldr	r0, =671	// initial x
-	ldr	r1, =480	// initial y
-	ldr	r2, =711	// final x
-	ldr	r3, =629	// final y
-	ldreq	r4, =rightquit_pic
-	bleq	CreateImage
-
-	b	menuloop
+	b	menuLoop
 menuexit:
 	mov	r0, FLAG
 	pop	{r4-r10, lr}
@@ -77,3 +64,15 @@ menuexit:
 
 	.unreq	BUTTON
 	.unreq	FLAG
+	
+keepPrompting:
+	push	{r4-r10, lr}
+	ldr	r1, =NONE
+	
+promptLoop:
+	bl	getInput
+	cmp	r0, r1
+	beq	promptLoop
+	
+	pop	{r4-r10, lr}
+	bx	lr
