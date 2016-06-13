@@ -89,7 +89,6 @@ pressAClearLoop:
 	bx	lr
 
 .globl dsclmPrint
-
 dsclmPrint:
 	push	{r4-r10, lr}
 
@@ -117,11 +116,31 @@ promptPrint:
 	pop 	{r4-r10, lr}
 	bx	lr
 
+.globl	clearLife
+clearAllNums:
+	push	{r4-r10, lr}
+	//clearsFuel
+	ldr	r0, =570		// initialX
+	ldr	r1, =40			// initialY
+	add	r2, r0, #30		// finalX
+	add	r3, r1, #10		// finalY
+	ldr	r4, =0x0000
+	bl	CreateImage
+	
+	//clearsLives
+	ldr	r0, =710
+	ldr	r1, =40
+	add	r2, r0, #30
+	add	r3, r1, #10
+	ldr	r4, =0x0000
+	bl CreateImage
+	
+	pop	{r4-r10, lr}
+	bx	lr
+
 .globl	writeLife
 	.equ	LIFE_X, 710
 	.equ	LIFE_Y, 40	
-
-
 	LIFE .req r5
 writeLife:
 	push	{r4-r10, lr}
@@ -168,29 +187,24 @@ writeFuel:
 	addge	TEN, #9		// to nine, and branch to print
 	addge	ONE, #9
 	bge	printNum
-
 getHundred:
 	cmp	NUM, #100	
 	subge	NUM, #100	// if the number >= 100, then		
 	addge	HUND, #1	// add 1 to hundreds
 	bge	getHundred	// keep looping until number < 100
-
 getTen:
 	cmp	NUM, #10	
 	subge	NUM, #10	// if the number >= 10, then		
 	addge	TEN, #1		// add 1 to tens
 	bge	getTen		// keep looping until number < 10
-
 getOne:
 	cmp	NUM, #1	
 	subge	NUM, #1		// if the number >= 0, then		
 	addge	ONE, #1		// add 1 to ones
 	bge	getOne		// keep looping until number < 1
-	
 printNum:
 	mov	r8, #2		// if looking for fuel numbers
 	ldr	r9, =FUEL_X	// initialize x-coordinate
-
 printNumLoop:
 	ldr	r1, =0xFFFF	// arg 2: colour of string
 	mov	r2, r9		// arg 3: x-coord
@@ -202,13 +216,10 @@ printNumLoop:
 	movmi	r0, ONE		// 0 - 1 = negative flag (mi)
 	
 	bl	DrawChar	// prints one char
-				
 	add	r9, #8		// move to next one or something
-
 	cmp	r8, #-1
 	beq	printNumEnd
 	b	printNumLoop
-
 printNumEnd:
 	pop	{r4-r10, lr}
 	bx	lr
