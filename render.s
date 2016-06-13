@@ -180,6 +180,7 @@ render:
 	blne	drawWin		// otherwise draw the win or lose menu
 	bleq	drawLose
 	bl	promptPrint
+	bl	keepPrompting
 	b	renderEnd
 	/*
 	ne - one	(2 - 1) win
@@ -188,6 +189,7 @@ render:
 	*/
 renderNormal:
 	bl	drawFace
+	bl	clearAllNums
 	bl	writeFuel
 	bl	writeLife
 	bl	drawNewMap
@@ -322,7 +324,7 @@ drawBanner:
 	pop	{r4-r10, lr}
 	bx	lr
 	
-	.equ	BERNIE, 0
+	.equ	BERNIE, 1
 	
 	SPAWNADRS	.req r4
 	COUNT		.req r5
@@ -385,21 +387,22 @@ drawPlayer:
 	push	{r4-r10, lr}
 	ldr	PLAYERADRS, =player		// loading base address
 	
-	ldr	r1, =oneDirection		// check which direction player moved
-	ldr	r0, [r1]			// retrieve the value of direction
-	
-	cmp	r0, #2
-	beq	drawPlayerCont			// if doesn't move, then skip erasing
-	
-						// handles erasing the previous drawn item
-	cmp	r0, #0				// if moved left, erase right
-	moveq	DIFFERENCE, #1			// store difference in r0
-	cmp	r0, #1				// if moved right, erase left
-	moveq	DIFFERENCE, #-1			// store difference in r0
 
-	ldr	r1, [PLAYERADRS]		// get column
-	add	r0, DIFFERENCE			// get the desired column (difference + column)
-	ldr	r1, [PLAYERADRS, #4]		// get row
+	ldr	r1, =oneDirection		// check which direction player moved
+	ldr	r0, [r1]			// retrieve the value of direction	
+	cmp	r0, #2
+	bne	getOldPos
+
+	ldr	r1, =faceState
+	ldr	r0, [r1]
+	cmp	r0, #1				// check if there was a collision
+	bne	drawPlayerCont
+
+getOldPos:
+	ldr	r2, =previousPos		// retrieve previous position
+	ldr	r0, [r2]			// retrieve column
+	ldr	r1, [r2, #4]			// retrieve row
+
 	bl	getTileRef			// retrieve the tile reference
 	ldr	r1, [r0]			// retrieve tile type
 	cmp	r1, #0				// check if the tile is side or road

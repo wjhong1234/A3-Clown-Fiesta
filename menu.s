@@ -64,7 +64,8 @@ menuexit:
 
 	.unreq	BUTTON
 	.unreq	FLAG
-	
+
+.globl	keepPrompting	
 keepPrompting:
 	push	{r4-r10, lr}
 	ldr	r1, =NONE
