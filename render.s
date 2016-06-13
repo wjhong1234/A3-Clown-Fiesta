@@ -129,7 +129,8 @@ noPixel$:
 	.unreq	row
 	.unreq	mask
 
-	pop		{r4-r10, pc}
+	pop	{r4-r10, lr}
+	bx	lr
 
 .globl	drawTile
 /*
@@ -172,7 +173,7 @@ initDraw:
 .globl	render
 render:
 	push	{r4-r10, lr}
-	
+	/*
 	ldr	r0, =status	// check if the player has lost or won
 	ldr	r1, [r0]
 	subs	r1, #1	
@@ -181,6 +182,7 @@ render:
 	blmi	drawLose
 	bl	promptPrint
 	b	renderEnd
+	*/
 	/*
 	ne - one	(2 - 1) win
 	eq - zero	(1 - 1) lose
@@ -299,9 +301,9 @@ drawFace:
 	ldrne	r4, =face_f	// fuel (2) - 1 = positive flag (ne)
 	ldrmi	r4, =face_n	// normal (0) - 1 = negative flag (mi)
 	
-	mov	r0, #47		// initial x
+	mov	r0, #54		// initial x
 	ldr	r1, =568	// initial y
-	ldr	r2, =167	// final x
+	ldr	r2, =174	// final x
 	ldr	r3, =755	// final y
 	bl	CreateImage
 	

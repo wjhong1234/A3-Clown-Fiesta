@@ -9,7 +9,7 @@ Short List:
   
   i.    IMPORTANT
     :: What we need to figure out ASAP
-  ii.   Input   !!!!!  [COMPLETE]
+  ii.   Input
     :: Taking the input from the player and causing things to happen
   iii.  Game Update
     :: Keeping track of changes in state
@@ -19,7 +19,7 @@ Short List:
     :: Keeping track of map and objects on map
   vi.   Item State
     :: Keeping track of the items on the map
-  vii.  Create Graphics !!!!!  [COMPLETE]
+  vii.  Create Graphics
     :: Actually creating what will be seen
   viii. Optimize
     :: To be added
@@ -29,7 +29,7 @@ Comprehensive List:
   
   i. IMPORTANT
     o Skeleton of the game logic
-    / Redrawing of game screen
+    o Redrawing of game screen
       x Main Menu
         x Movement of choice markers
       o Game
@@ -43,57 +43,55 @@ Comprehensive List:
       x Up
       x Down
       x A (Select the item)
-    x Game
-      x Left
-      x Right
-      x A (Movement)
-      x Select (Restart game)
-      x Start (Exit game)
+    o Game
+      o Left
+      o Right
+      o A (Movement)
+      o Select (Restart game)
+      o Start (Exit game)
   
   iii. Game Update
-    / Track loss
-      / Contact
-      x No more fuel
-    x Track win
-      x Reach end
-      COMMENT: FIGURE OUT WHERE MAP ENDS?
-    x Track amount traveled (?)
-    x Fuel effect
-      x Increase: Fuel item
-      x Decrease: Time/Pressing A
-    x Contact effect (lose 10 fuel, one life)
-      x Car
-      x Side tile
+    o Track loss
+      o Contact
+      o No more fuel
+    o Track win
+      o Reach end
+    o Track amount traveled (?)
+    o Fuel effect
+      o Increase: Fuel item
+      o Decrease: Time/Pressing A
+    o Contact effect (lose 10 fuel, one life)
+      o Car
+      o Side tile
       o Redraw at center
-    / Item update
+    o Item update
       / Randomly place items
         / Fuel
         / Cars
   
   iv. Game State
     o Initialize state
-    x Track items
-      x Cars
-      x Fuel
-    x Track player's status
-      x Lives
-      x Fuel units
-    x Track win condition
-    x Track lose condition
+    o Track items
+      o Cars
+      o Fuel
+    o Track player's status
+      o Lives
+      o Fuel units
+    o Track win condition
+    o Track lose condition
 
   v. Game Map
     / Form array map
       x Decide size of side and road
-      x Initialize array
-        COMMENT: MUST FIX THIS
-      X Flag side tiles
-      X Flag road tiles
+      / Initialize array
+        COMMENT: still working on this
+      o Flag side tiles
+      o Flag road tiles
       o Flag if occupied with "fuel" or "car"
-    REMOVED: Iffy
+    o Iffy
       COMMENT: Will mentioned that it was weird to have it here. idk.
       o Place reference for fuel
       o Place reference for lives
-      COMMENT: Reference has been placed elsewhere
 
   vi. Item State
     o Track amount appeared
@@ -107,26 +105,26 @@ Comprehensive List:
       x Start (text)
       x Choice marker
       x Creator names (text)
-    x Game
-      x Background
-        x Road
-          x Decide what road should be
-        x Left Side 
-          x Donald Trump
-            x Three faces
-          REMOVED: o Quotes (?)
-          x American eagle
-        REMOVED: o Right Side
-          REMOVED: o Statue of Liberty
-      x Items on Road
-        x Player
-        x "Fuel" (toupe)
-        x "Cars" (still unsure)
-          x decide what antagonist should be
-    x Condition Screens
-      x Lose screen
-      x Win screen
-    REMOVED: o Prompt Pop-up (pausing the game)
+    o Game
+      o Background
+        o Road
+          o Decide what road should be
+        o Left Side 
+          o Donald Trump
+            o Three faces
+          o Quotes (?)
+          o American eagle
+        o Right Side
+          o Statue of Liberty
+      o Items on Road
+        o Player
+        o "Fuel" (toupe)
+        o "Cars" (still unsure)
+          o decide what antagonist should be
+    o Condition Screens
+      o Lose screen
+      o Win screen
+    o Prompt Pop-up (pausing the game)
       o Resume (text)
       o Quit (text)
       

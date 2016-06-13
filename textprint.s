@@ -64,13 +64,13 @@ pressAPrint:
 	pop 	{r4-r10, lr}
 	bx	lr
 
-
 	.equ	ROW, 10
 	COL	.req r4
 	ADRS	.req r5
 .globl pressAClear
 pressAClear:
 	push	{r4-r10, lr}
+
 	mov	COL, #9
 pressAClearLoop:
 	mov	r0, COL
@@ -246,7 +246,6 @@ textLoop:
 
 	pop	{r4-r10, lr}
 	bx	lr
-
 .section .data
 
 .align 4

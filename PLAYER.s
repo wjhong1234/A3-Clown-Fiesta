@@ -72,7 +72,7 @@ next:	str	XPOSITION, [BASEADDRESS]	//update xposition
 	.unreq	BASEADDRESS
 	.unreq	XPOSITION
 	
-	pop	{r4-r10}
+	pop	{r4-r10,lr}
 	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
