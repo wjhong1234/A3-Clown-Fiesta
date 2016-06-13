@@ -286,28 +286,41 @@ drawCont:
 	.unreq	COL
 	.unreq	ADRS
 
+	.equ	MAX_CYCLE, 5
+	ADRS	.req	r0
+	CYCLES	.req	r1
 /*
 drawFace
 Draws Trump's faces.
 0 - normal, 1 - collision, 2 - fuel
 */
 drawFace:
-	push	{r4, lr}	
+	push	{r4-r10, lr}	
 	
-	ldr	r0, =faceState	// Retrieves the current state of Trump
-	ldr	r1, [r0]	
-	subs	r1, #1		// check the status of face
-	ldreq	r4, =face_c	// collision (1) - 1 = zero flag (eq)
-	ldrne	r4, =face_f	// fuel (2) - 1 = positive flag (ne)
-	ldrmi	r4, =face_n	// normal (0) - 1 = negative flag (mi)
+	ldr	ADRS, =faceState	// Retrieves the current state of Trump
+	ldr	r1, [ADRS]	
+	subs	r1, #1			// check the status of face
+	ldreq	r4, =face_c		// collision (1) - 1 = zero flag (eq)
+	ldrne	r4, =face_f		// fuel (2) - 1 = positive flag (ne)
+	bmi	revertFace		// normal (0) - 1 = negative flag (mi)
 	
-	mov	r0, #54		// initial x
-	ldr	r1, =568	// initial y
-	ldr	r2, =174	// final x
-	ldr	r3, =755	// final y
+revertFace:				// before reverting face to the regular one, we wait a set amount of cycles
+	ldr	ADRS, =faceTimer	// load the faceTimer to retrieve the amount of cycles already passed
+	ldr	CYCLES, [ADRS]	
+	add	CYCLES, #1		// increment the amount of cycles
+	cmp	CYCLES, MAX_CYCLE	// Check if the amount of cycles passed equals the max amount of cycles wanted
+	movge	CYCLES, #0		// If they are equal, reset the timer
+	ldrge	r4, =face_n		// If they are equal, revert face to normal
+	
+	str	CYCLES, [ADRS]		// Store the new value of cycles
+	
+	mov	r0, #54			// initial x
+	ldr	r1, =568		// initial y
+	ldr	r2, =174		// final x
+	ldr	r3, =755		// final y
 	bl	CreateImage
 	
-	pop	{r4, lr}
+	pop	{r4-r10, lr}
 	bx	lr
 
 /*
@@ -539,3 +552,6 @@ clearLoop:
 
 .section .data
 font:	.incbin "font.bin"
+
+faceTimer:
+	.int	0		// counts the amount of cycles that the face is allowed to stay
