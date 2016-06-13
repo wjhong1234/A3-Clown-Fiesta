@@ -14,9 +14,9 @@ Instance of game environment
 	.equ	SIDE, 1
 .section .text
 	// adjust the latter number as necessary
-	.equ	END, 22 * 8	// end of the map	
+	.equ	END, 22 * 5	// end of the map	
 
-
+.globl updateRoad
 /*
 redraws the center tiles.
 */
@@ -160,14 +160,14 @@ r0 - 0 if false, 1 if true
 */
 hasCollide:
 	push	{r4-r10, lr}
-	ldr	r1, =player		// retrieve player reference
-	ldr	r0, [r1, #4]	// load column of player
-	mov	r1, #22			// retrieve row of player
+	ldr	r2, =player		// retrieve player reference
+	ldr	r0, [r2]		// load column of player
+	ldr	r1, [r2, #4]		// retrieve row of player
 	bl	getTileRef		// retrieve tile reference
 	ldr	r1, [r0]		// load tile type
-	cmp	r1, #0			// check if tile is side
-	moveq	r0, #1		// return true if side
-	movne	r0, #0		// return false if not
+	cmp	r1, #SIDE		// check if tile is side
+	moveq	r0, #1			// return true if side
+	movne	r0, #0			// return false if not
 	pop	{r4-r10, lr}
 	bx	lr
 
@@ -182,7 +182,8 @@ r0 - 0 if false, 1 if true
 isEnd:
 	push	{r4-r10, lr}
 
-	ldr	r0, =tilePassed
+	ldr	r2, =tilePassed
+	ldr	r0, [r2]
 	ldr	r1, =END
 	cmp	r0, r1
 	movge	r0, #1

@@ -122,17 +122,17 @@ clearAllNums:
 	//clearsFuel
 	ldr	r0, =570		// initialX
 	ldr	r1, =40			// initialY
-	add	r2, r0, #30		// finalX
-	add	r3, r1, #10		// finalY
-	ldr	r4, =0x0000
+	add	r2, r0, #29		// finalX
+	add	r3, r1, #11		// finalY
+	ldr	r4, =clearNums_img
 	bl	CreateImage
 	
 	//clearsLives
 	ldr	r0, =710
 	ldr	r1, =40
-	add	r2, r0, #30
-	add	r3, r1, #10
-	ldr	r4, =0x0000
+	add	r2, r0, #29
+	add	r3, r1, #11
+	ldr	r4, =clearNums_img
 	bl CreateImage
 	
 	pop	{r4-r10, lr}
@@ -275,6 +275,6 @@ instr2: .ascii "START: RESTART"	// 14
 .globl pressA
 pressA: .ascii "PRESS A TO START"	// 16
 .globl dsclm
-dsclm: .ascii "DISCLAIMER: We are not Trump supporters."	// 40
+dsclm: .ascii "DISCLAIMER: WE ARE NOT TRUMP SUPPORTERS"	// 40
 .globl prompt
 prompt: .ascii "PRESS ANY BUTTON TO CONTINUE"	// 28

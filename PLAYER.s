@@ -122,7 +122,7 @@ resetPlayerPosition:
 .globl	player
 player:	.int	12		//x position of player
 	.int	21		//y position of player
-	.int	100		//player fuel
+	.int	500		//player fuel
 	.int	3		//player lives
 .globl	oneDirection
 oneDirection:

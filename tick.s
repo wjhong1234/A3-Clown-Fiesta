@@ -28,6 +28,7 @@
 .globl	tick
 	RESTART_FLAG	.req r8
 	BUTTON 		.req r6
+	INPUT		.req r7
 /*
 tick
 
@@ -56,15 +57,15 @@ gameStart:
 gameLoop:
 	bl	getInput		// get input of player
 	bl	readInput		// read the input
-	
-	// checks for updates on player input
+	mov	INPUT, r0	
+					// checks for updates on player input
 	mov	r1, #0			
 	ldr	r2, =gameState
-	cmp	r0, #EXIT		// check if player is exiting
+	cmp	INPUT, #EXIT		// check if player is exiting
 	streq	r1, [r2]		// if the player is exiting, then store it and branch to end
 	beq	gameEnd
 	
-	cmp	r0, #RESTART		// check if player is restarting
+	cmp	INPUT, #RESTART		// check if player is restarting
 	moveq	RESTART_FLAG, #1	// Flag for restart if so
 	beq	gameStart		
 	
@@ -74,13 +75,13 @@ gameLoop:
 	bne	gameEnd			// if not, then don't update anything
 gameMove:
 	mov	r1, #2
-	cmp	r0, #MOVE_LEFT		// check if moved left
+	cmp	INPUT, #MOVE_LEFT	// check if moved left
 	moveq	r1, #0		
-	cmp	r0, #MOVE_RIGHT		// check if 
+	cmp	INPUT, #MOVE_RIGHT	// check if 
 	moveq	r1, #1			// move right if right
 	cmp	r1, #2			// if has moved
-	movne	r0, r1			
-	blne	movePlayer		// then update the position of player
+	movne	r0, r1
+	blne	updatePlayer
 
 //	bl	updateRoad		// update map based on the input
 	bl	updateSpawn
@@ -97,6 +98,8 @@ gameMove:
 gameEnd:
 	pop	{r4-r10, lr}
 	bx	lr
+
+	.unreq	INPUT
 
 /*
 readInput
@@ -126,6 +129,7 @@ checkPlay:
 	cmp	r0, #1	
 	bne	checkButtons		// if not, do not check for movement
 	streq	r0, [PLAY_ADRS]		// if so, then store it into memory
+	bleq	pressAClear		// clears the press A text
 	
 checkMove:			
 	mov	r0, BUTTON		// Check if player pressed left
@@ -159,6 +163,28 @@ checkButtons:
 
 	.unreq ACTION
 
+/*
+updatePlayer
+Saves previous position and updates player to new one
+*/
+updatePlayer:
+	push	{r4-r10, lr}
+
+	mov	r5, r0			// save new movement
+	ldr	r3, =player
+	ldr	r4, =previousPos
+	ldr	r0, [r3]		
+	str	r0, [r4]		// Store previous column
+	ldr	r0, [r3, #4]
+	str	r0, [r4, #4]		// store previous row
+
+	mov	r0, r5			// Updates players position
+	bl	movePlayer	
+	
+
+	pop	{r4-r10, lr}
+	bx	lr
+
 updateSpawn:
 	push	{r4-r10, lr}
 	
@@ -172,26 +198,25 @@ updateSpawn:
 updateState
 Depending on the state of the player, updates it.
 */
-	.equ	FUEL_LOSS, 5  
+	.equ	FUEL_LOSS, 1 
 	.equ	NORMAL, 0	
 	.equ	COLLISION, 1
 	.equ	FUEL, 2
 	.equ	HAIR_TYPE, 0
 	.equ	BERNIE_TYPE, 1
 updateState:
-	BERNIE_FLAG	.req r4		// checks if collided with car
 	HIT_FLAG 	.req r5		// [0/1]
 	FUEL_FLAG	.req r6		// [0/1/2] - 0, no change; 1, addition; 2 - subtraction
 	LIVES 		.req r7
 	FUEL 		.req r8
 
 	push 	{r4-r10, lr}
-	mov	BERNIE_FLAG, #0
 	mov	HIT_FLAG, #0
 	mov	FUEL_FLAG, #0
 	// initializes the changes of the game state
 	mov	LIVES, #0		
-	mov	FUEL, #FUEL_LOSS
+	mov	FUEL, #0
+	sub	FUEL, #FUEL_LOSS
 
 	// this section checks if there were changes to the player state
 	bl	hasCollide		// check if player has hit the sides
@@ -205,7 +230,6 @@ updateState:
 	cmp	r1, #HAIR_TYPE		// Check if the item is fuel or otherwise
 	moveq	FUEL_FLAG, #1
 	movne	HIT_FLAG, #1	
-	movne	BERNIE_FLAG, #1
 
 	// here we update variables of the game
 updateVar:
@@ -214,19 +238,21 @@ updateVar:
 	cmp	HIT_FLAG, #1		// checks if player has collided with something
 	subeq	LIVES, #1
 	subeq	FUEL, #10
+	bleq	resetPlayerPosition
 
 	ldr	r0, =tilePassed		// increase the tile count
 	ldr	r3, [r0]
 	add	r3, #1
 	str	r3, [r0]
 	
-	ldr	r1, [r0, #8]		// retrieve player's current life
+	ldr	r0, =player
+	ldr	r1, [r0, #12]		// retrieve player's current life
 	add	LIVES, r1		// adjust it according to the update
-	str	LIVES, [r0, #8]		// Store updated life
+	str	LIVES, [r0, #12]	// Store updated life
 
-	ldr	r1, [r0, #12]		// retrieve player's current fuel
+	ldr	r1, [r0, #8]		// retrieve player's current fuel
 	add	FUEL, r1		// adjust it according to the update
-	str	FUEL, [r0, #12]		// Store new fuel
+	str	FUEL, [r0, #8]		// Store new fuel
 	
 	mov	r1, #NORMAL		// initialize face state as normal
 	cmp	HIT_FLAG, #1		// check if the player had a collision
@@ -236,27 +262,27 @@ updateVar:
 	ldr	r0, =faceState		// Store Trump's current state in order to redraw his face
 	str	r1, [r0]
 	
-	cmp	HIT_FLAG, #1		// Reset player position if there was a collision
-	bleq	resetPlayerPosition
-	cmp	BERNIE_FLAG, #1		// Removes spawn if collision was caused by enemy
-	bleq	obliterate		// 
-	// currently we don't know if the game is running
 	// here we check if the lose or win flags have been triggered
-/*
 updateGameState:
 	PARAMETER .req r9
 	mov	PARAMETER, #0
+	ldr	r0, =player
+	ldr	LIVES, [r0, #12]	
 	cmp	LIVES, #0		// If lives <= 0, trigger loss
-	movle	PARAMETER, #LOSE		
+	movle	PARAMETER, #LOSE
+	ldr	FUEL, [r0, #8]		
 	cmp	FUEL, #0		// If fuel <= 0, trigger loss	
 	movle	PARAMETER, #LOSE		
+/*
 	bl	isEnd			// If player has reached end, trigger win
-	cmp	PARAMETER, #1		
+	mov	r10, r0
+	cmp	r10, #1		
 	moveq	PARAMETER, #WIN
+*/
 	ldr	r1, =status		// Store whether or not the player won or lost
 	str	PARAMETER, [r1]			
+
 	.unreq	PARAMETER
-*/
 	pop	{r4-r10, lr}		
 	bx	lr			
 
@@ -279,20 +305,22 @@ states:
 // Checks if the player lost or won
 status:
 	.int	0
-.align
 .globl	gameState
 // Checks if the player has chosen to quit
 gameState:
 	.int	0
-.align	
 .globl	faceState
 // tracks which face Trump will make
 faceState:				
 	.int	0			// 0 - normal
 					// 1 - collision
-.align					// 2 - fuel
 .globl	play
 // Checks if the player has pressed A					
 play:
 	.int	0		
-	.end	
+
+.globl	previousPos
+previousPos:
+	.int	0			// 0 - col
+	.int	0			// 1 - row
+	.end

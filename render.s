@@ -33,15 +33,16 @@ CreateImage:
 DrawLoop:
 	mov	r0, x 
 	mov	r1, y
-	ldrh	r2, [color], #2		// load the color of the image and increment the address to be loaded
+	ldrh	r2, [color], #2	// load the color of the image
+				// and increment the address to be loaded
 	bl	DrawPixel
 	
-	cmp	x, x_final		// once reached desired x coordinate
-	addeq	y, #1			// move downward
-	moveq	x, x_start		// and restart at the beginning	
-	addne	x, #1			// otherwise, continue rightward
-	cmp	y, y_final		// check if reached the desired y coordinate
-	ble	DrawLoop		// if not, keep looping
+	cmp	x, x_final	// once reached desired x coordinate
+	addeq	y, #1		// move downward
+	moveq	x, x_start	// and restart at the beginning	
+	addne	x, #1		// otherwise, continue rightward
+	cmp	y, y_final	// check if reached the desired y coordinate
+	ble	DrawLoop	// if not, keep looping
 
 	pop 	{r4-r10, lr}
 	bx	lr
@@ -143,9 +144,9 @@ r2 - tile address
 	
 drawTile:
 	push	{r4, lr}
-	mov	r4, r2			// move address (r0) to arg 4
-	add	r2, r0, #31		// x + 32 = x final
-	add	r3, r1, #31		// y + 32 = y final
+	mov	r4, r2		// move address (r0) to arg 4
+	add	r2, r0, #31	// x + 32 = x final
+	add	r3, r1, #31	// y + 32 = y final
 	bl	CreateImage
 
 	pop	{r4, lr}
@@ -156,9 +157,6 @@ drawTile:
 	parts of the game.
 */
 .globl	initDraw
-/*
-Draws initial images of the game.
-*/
 initDraw:
 	push	{r4-r10, lr}
 	bl	drawMap
@@ -171,17 +169,15 @@ initDraw:
 	pop	{r4-r10, lr}
 	bx	lr
 
+
 .globl	render
-/*
-Redraws the game as the game updates.
-*/
 render:
 	push	{r4-r10, lr}
-	ldr	r0, =status		// check if the player has lost or won
+	ldr	r0, =status	// check if the player has lost or won
 	ldr	r1, [r0]
 	subs	r1, #1	
-	bmi	renderNormal		// If the player hasn't won or lost, render normally
-	blne	drawWin			// otherwise draw the win or lose menu
+	bmi	renderNormal	// If the player hasn't won or lost, render normally
+	blne	drawWin		// otherwise draw the win or lose menu
 	bleq	drawLose
 	bl	promptPrint
 	bl	keepPrompting
@@ -200,9 +196,9 @@ renderNormal:
 	bl	drawSpawn
 	bl	drawPlayer
 
-	ldr	r0, =play		// check if the player has pressed A
+	ldr	r0, =play	// check if the player has pressed A
 	ldr	r1, [r0]
-	cmp	r1, #0			// if the player hasn't pressed A, prompt for it
+	cmp	r1, #0		// if the player hasn't pressed A, prompt for it
 	bleq	pressAPrint
 renderEnd:
 	pop	{r4-r10, lr}
@@ -260,29 +256,29 @@ drawMap:
 drawMapLoop:
 	mov	r0, COL
 	mov	r1, ROW
-	bl	getTileRef		// check if tile is a side or a road
+	bl	getTileRef	// check if tile is a side or a road
 	mov	ADRS, r0
-	ldr	r2, [ADRS]		// load the tile type
-	ldr	r1, [ADRS, #12]		// load to check if it's a lane tile
-	cmp	r1, #0			// check if it's a lane tile
-	ldrne	r3, =lane_tile		// if it is, branch away to draw lane tile
+	ldr	r2, [ADRS]	// load the tile type
+	ldr	r1, [ADRS, #12]	// load to check if it's a lane tile
+	cmp	r1, #0		// check if it's a lane tile
+	ldrne	r3, =lane_tile	// if it is, branch away to draw lane tile
 	bne	drawCont
-	cmp	r2, #ROAD		// else, check if it's a road or side tile
+	cmp	r2, #ROAD	// else, check if it's a road or side tile
 	ldreq	r3, =road_tile
 	ldrne	r3, =grass_tile
 
 drawCont:
-	ldr	r0, [ADRS, #4]		// retrieve x
-	ldr	r1, [ADRS, #8]		// retrieve y
-	mov	r2, r3			// move address of image
+	ldr	r0, [ADRS, #4]	// retrieve x
+	ldr	r1, [ADRS, #8]	// retrieve y
+	mov	r2, r3		// move address of image
 	bl	drawTile
 			
-	add	COL, #1			// increase the column
-	cmp	COL, #25		// check if reached rightmost column
-	movge	COL, #0			// if so, return to beginning
-	addge	ROW, #1			// and go to next row
-	cmp	ROW, #21		// check if reached bottom-most row
-	ble	drawMapLoop		// if not, keep looping
+	add	COL, #1		// increase the column
+	cmp	COL, #25	// check if reached rightmost column
+	movge	COL, #0		// if so, return to beginning
+	addge	ROW, #1		// and go to next row
+	cmp	ROW, #21	// check if reached bottom-most row
+	ble	drawMapLoop	// if not, keep looping
 	
 	pop	{r4-r10, lr}
 	bx	lr
@@ -312,7 +308,7 @@ revertFace:				// before reverting face to the regular one, we wait a set amount
 	ldr	ADRS, =faceTimer	// load the faceTimer to retrieve the amount of cycles already passed
 	ldr	CYCLES, [ADRS]	
 	add	CYCLES, #1		// increment the amount of cycles
-	cmp	CYCLES, MAX_CYCLE	// Check if the amount of cycles passed equals the max amount of cycles wanted
+	cmp	CYCLES, #MAX_CYCLE	// Check if the amount of cycles passed equals the max amount of cycles wanted
 	movge	CYCLES, #0		// If they are equal, reset the timer
 	ldrge	r4, =face_n		// If they are equal, revert face to normal
 	
@@ -334,10 +330,10 @@ Draws the banner on the left side of the game screen.
 */
 drawBanner:
 	push	{r4-r10, lr}	
-	mov	r0, #7			// initial x
-	mov	r1, #64			// initial y
-	ldr	r2, =223		// final x
-	ldr	r3, =767		// final y
+	mov	r0, #7		// initial x
+	mov	r1, #64		// initial y
+	ldr	r2, =223	// final x
+	ldr	r3, =767	// final y
 	ldr	r4, =banner
 	bl	CreateImage
 	pop	{r4-r10, lr}
@@ -512,7 +508,7 @@ drawWin:
 	ldr	r3, =767	// final y
 	ldr	r4, =win_pic
 	bl	CreateImage
-	
+	bl	dsclmPrint
 	pop	{r4, lr}
 	bx	lr
 
@@ -525,7 +521,7 @@ drawMenu:
 	ldr	r3, =767	// final y
 	ldr	r4, =menu_pic
 	bl	CreateImage
-	
+	bl	dsclmPrint
 	pop	{r4, lr}
 	bx	lr
 

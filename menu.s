@@ -68,11 +68,11 @@ menuexit:
 .globl	keepPrompting	
 keepPrompting:
 	push	{r4-r10, lr}
-	ldr	r1, =NONE
+	ldr	r4, =NONE
 	
 promptLoop:
 	bl	getInput
-	cmp	r0, r1
+	cmp	r0, r4
 	beq	promptLoop
 	
 	pop	{r4-r10, lr}
