@@ -50,7 +50,6 @@ initPrint:
 	bx	lr
 
 .globl pressAPrint
-
 pressAPrint:
 	push	{r4-r10, lr}
 
@@ -67,6 +66,7 @@ pressAPrint:
 	.equ	ROW, 10
 	COL	.req r4
 	ADRS	.req r5
+
 .globl pressAClear
 pressAClear:
 	push	{r4-r10, lr}
@@ -116,7 +116,7 @@ promptPrint:
 	pop 	{r4-r10, lr}
 	bx	lr
 
-.globl	clearLife
+.globl	clearAllNums
 clearAllNums:
 	push	{r4-r10, lr}
 	//clearsFuel
@@ -170,7 +170,6 @@ Writes the fuel.
 	HUND .req r5
 	TEN .req r6
 	ONE .req r7
-	
 writeFuel:
 	push	{r4-r10, lr}
 	
