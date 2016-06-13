@@ -83,6 +83,7 @@ spawn:
 
 	cmp	REQUIRED, #0			//compare item requirement to #1
 	addeq	REQUIRED, #1			//this ensures no items spawn instantly
+	ldr	BASEADDRESS, =tileReq		//load required tiles address
 	str	REQUIRED, [BASEADDRESS]		//update required tiles
 	b	endSpn				//end the function
 
@@ -133,6 +134,10 @@ cont:	ldr	BASEADDRESS, =lastTile		//load last tile address
 	ldr	BASEADDRESS, =lastTile		//load last tile address
 	str	CURRENT, [BASEADDRESS]		//update last tile
 
+endSpn:	
+	pop	{r4-r10, lr}
+	bx	lr
+
 	.unreq	OUTPUT
 	.unreq	BASEADDRESS
 	.unreq	SPAWNARRAY
@@ -145,8 +150,6 @@ cont:	ldr	BASEADDRESS, =lastTile		//load last tile address
 	.unreq	ITEMTYPE
 	.unreq	OFFSET
 
-endSpn:	pop	{r4-r10}
-	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
 
@@ -185,7 +188,7 @@ fin:	bl	enforceFence			//remove items now off the map
 	.unreq	ITEMCOUNT
 	.unreq	COUNTER
 
-	pop	{r4-r10}
+	pop	{r4-r10,lr}
 	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
@@ -257,7 +260,7 @@ gated:	.unreq	BASEADDRESS
 	.unreq	OFFSET
 	.unreq	SPARE
 
-	pop	{r4-r10}
+	pop	{r4-r10,lr}
 	bx	lr
 
 //---------------------------------------------------------------------------------------------------//
@@ -346,7 +349,7 @@ endZ:	.unreq	ITEMX
 	.unreq	ITEMTYPE
 	.unreq	SPARE
 
-	pop	{r4-r10}
+	pop	{r4-r10,lr}
 	bx	lr
 
 .section .data

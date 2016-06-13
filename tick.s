@@ -88,8 +88,8 @@ gameMove:
 
 	ldr	r0, =status		// checks if the player has won or lost
 	ldr	r1, [r0]
-	subs	r1, #1		
-	bmi	gameEnd			// if not, keep playing
+	cmp	r1, #0		
+	beq	gameEnd			// if not, keep playing
 	
 	ldr	r2, =gameState		// if the player has won or lost, then end the game
 	mov	r0, #0
@@ -240,20 +240,23 @@ updateVar:
 	bleq	resetPlayerPosition
 	cmp	BERNIE_FLAG, #1		// Removes spawn if collision was caused by enemy
 	bleq	obliterate		// 
-	
+	// currently we don't know if the game is running
 	// here we check if the lose or win flags have been triggered
+/*
 updateGameState:
-	mov	r0, #0
+	PARAMETER .req r9
+	mov	PARAMETER, #0
 	cmp	LIVES, #0		// If lives <= 0, trigger loss
-	movle	r0, #LOSE		
+	movle	PARAMETER, #LOSE		
 	cmp	FUEL, #0		// If fuel <= 0, trigger loss	
-	movle	r0, #LOSE		
+	movle	PARAMETER, #LOSE		
 	bl	isEnd			// If player has reached end, trigger win
-	cmp	r0, #1		
-	moveq	r0, #WIN
+	cmp	PARAMETER, #1		
+	moveq	PARAMETER, #WIN
 	ldr	r1, =status		// Store whether or not the player won or lost
-	str	r0, [r1]
-					
+	str	PARAMETER, [r1]			
+	.unreq	PARAMETER
+*/
 	pop	{r4-r10, lr}		
 	bx	lr			
 

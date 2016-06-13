@@ -173,16 +173,14 @@ initDraw:
 .globl	render
 render:
 	push	{r4-r10, lr}
-	/*
 	ldr	r0, =status	// check if the player has lost or won
 	ldr	r1, [r0]
 	subs	r1, #1	
-	beq	renderNormal	// If the player hasn't won or lost, render normally
+	bmi	renderNormal	// If the player hasn't won or lost, render normally
 	blne	drawWin		// otherwise draw the win or lose menu
-	blmi	drawLose
+	bleq	drawLose
 	bl	promptPrint
 	b	renderEnd
-	*/
 	/*
 	ne - one	(2 - 1) win
 	eq - zero	(1 - 1) lose
@@ -324,6 +322,8 @@ drawBanner:
 	pop	{r4-r10, lr}
 	bx	lr
 	
+	.equ	BERNIE, 0
+	
 	SPAWNADRS	.req r4
 	COUNT		.req r5
 	OFFSET		.req r6
@@ -356,7 +356,7 @@ drawSpawnLoop:
 	bl	getTileRef
 	mov	TILEADRS, r0			
 	ldr	r0, [SPAWNADRS, #8]
-	cmp	r0, #1				// check if the item is bernie or toupee
+	cmp	r0, #BERNIE			// check if the item is bernie or toupee
 	ldreq	r2, =bernie
 	ldrne	r2, =toupee
 	ldr	r0, [TILEADRS, #4]
