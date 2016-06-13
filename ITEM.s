@@ -32,7 +32,7 @@ spawn:
 
 	bl	xorShift			//generate a random number
 	and	OUTPUT, #255			//mask a number to a reasonable range
-	cmp	OUTPUT, #128			//permit a spawn of 50% chance
+	cmp	OUTPUT, #128			//permit a spawn of ~50% chance
 	bge	endSpn				//dont spawn
 
 spn:	bl	xorShift			//generate a random number
@@ -97,7 +97,7 @@ rebirth:
 
 	blt	gated				//end function if list not full
 
-rep:	cmp	COUNTER, #7
+rep:	cmp	COUNTER, ITEMCOUNT
 	bge	gated
 
 	ldr	ITEMY, [SPAWNARRAY, #4]		//load item y position
@@ -113,11 +113,12 @@ rep:	cmp	COUNTER, #7
 
 	mov	SPARE, #INITIAL_Y		//move default y into spare
 
-	str	ITEMX, [SPAWNARRAY], #4		//store x position
-	str	SPARE, [SPAWNARRAY], #4		//store y position
-	str	ITEMTYPE, [SPAWNARRAY], #4	//store item type
+	str	ITEMX, [SPAWNARRAY]		//store x position
+	str	SPARE, [SPAWNARRAY, #4]		//store y position
+	str	ITEMTYPE, [SPAWNARRAY, #8]	//store item type
 
 pass:	add	COUNTER, #1			//increment counter
+	add	SPAWNARRAY, #12			//next item memory increment
 	b	rep
 
 gated:	.unreq	OUTPUT
