@@ -57,7 +57,7 @@ pressAPrint:
 	ldr	r0, =pressA
 	mov	r1, #16
 	ldr	r2, =550
-	ldr	r3, =384
+	ldr	r3, =400
 	ldr	r4, =0xFFFF
 	bl	printText
 
@@ -246,27 +246,3 @@ textLoop:
 
 	pop	{r4-r10, lr}
 	bx	lr
-
-.section .data
-
-.align 4
-.globl font
-font:		.incbin	"font.bin"
-.globl fuel
-fuel: .ascii "FUEL:"	// 5
-.globl life
-life: .ascii "LIVES:"	// 6
-.globl tuto1
-tuto1: .ascii "GET TRUMP TO THE WHITE HOUSE!"	// 29
-.globl tuto2
-tuto2: .ascii "AVOID BERNIE, COLLECT TOUPEES"	// 29
-.globl instr1
-instr1: .ascii "SELECT: MAIN MENU"	// 17
-.globl instr2
-instr2: .ascii "START: RESTART"	// 14
-.globl pressA
-pressA: .ascii "PRESS A TO START"	// 16
-.globl dsclm
-dsclm: .ascii "DISCLAIMER: We are not Trump supporters."	// 40
-.globl prompt
-prompt: .ascii "PRESS ANY BUTTON TO CONTINUE"	// 28
