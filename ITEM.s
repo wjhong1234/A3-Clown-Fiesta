@@ -237,7 +237,10 @@ fence:	cmp	COUNTER, ITEMCOUNT		//compare item count to counter
 
 //---------------------------------------------------------------------------------------------------//
 
-deport:	sub	SPAWNARRAY, #4			//address correction
+deport:	cmp	COUNTER, ITEMCOUNT		//compare current counter to item count
+	bge	build				//if the item being deleted is the last item, just decrement
+
+	sub	SPAWNARRAY, #4			//address correction
 	ldr	BASEADDRESS, =spawnArray	//load spawn array address
 
 	sub	OFFSET, ITEMCOUNT, #1		//decrement itemcount to calculate offset
@@ -253,7 +256,7 @@ deport:	sub	SPAWNARRAY, #4			//address correction
 	str	ITEMY, [SPAWNARRAY], #4		//replace deleted item yposition with last item yposition
 	str	ITEMTYPE, [SPAWNARRAY]		//replace deleted item type with last item type
 
-	ldr	BASEADDRESS, =itemCount		//load item count address
+build:	ldr	BASEADDRESS, =itemCount		//load item count address
 	sub	ITEMCOUNT, #1			//decrement item count since an item was removed
 	str	ITEMCOUNT, [BASEADDRESS]	//update item count
 
